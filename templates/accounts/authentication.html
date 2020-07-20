@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication</title>
+</head>
+<body>
+  
+  
+  {% if user.is_authenticated %}
+    <meta http-equiv = "refresh" content = " 0; url = {% url 'quiz:home' %} " />
+  {% endif %}
+  
+  <div>
+    {% if type_form == 'login' %}
+      <h1>Login</h1>
+    {% else %}
+      <h1>Register</h1>
+    {% endif %}
+    {% load crispy_forms_tags %}
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form|crispy }}
+
+      
+      {% if type_form == 'login' %}
+       
+        <div> 
+          <a href="{% url 'accounts:pass_reset' %}"> <p>Reset Password</p> </a>  
+        </div>
+        <div >
+          <p> {{message}} </p>
+          <button type="submit">Login</button>
+        </div>
+
+        {% else %}
+
+        <p > {{message}} </p>
+        <div> 
+            <button type="submit" >Register</button>
+          </div>
+        {% endif %}
+
+
+</body>
+</html>
