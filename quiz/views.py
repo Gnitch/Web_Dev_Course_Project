@@ -15,8 +15,7 @@ def logout(request):
     return redirect('/')
 
 @login_required
-def form(request):
-    print(Job, Class)    
+def form(request):  
     if request.method == "POST" :
         quiz_form = QuizForm(request.POST)
         question_form = QuestionForm(request.POST)
@@ -30,7 +29,6 @@ def form(request):
             options_form_obj = options_form.save(commit=False)
             options_form_obj.question_id = question_form_obj.id
             options_form_obj.save()
-        # return render('quiz/home.html')
         return render(request, 'quiz/form.html')
       
     context = {
@@ -45,10 +43,8 @@ def quizList(request):
     quiz_object = Quiz.objects.all()
     question_obj = Question.objects.get(quiz_id=quiz_object[0].id)
     options_obj = Options.objects.get(question_id=question_obj.id)
-    print(quiz_object,question_obj,options_obj)
     options = str(options_obj.options)
     option_list = options.split(',')
-    print(option_list)
     context = {'option_list':option_list,'question_obj':question_obj}
     return render(request,'quiz/quizlist.html',context)
 
@@ -59,4 +55,11 @@ def home(request):
         'class_list':class_list,
     }
     return render(request,'quiz/home.html',context)
+
+
+
+
+
+
+
 
