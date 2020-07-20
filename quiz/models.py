@@ -9,6 +9,7 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    question = models.TextField(blank=False,null=False)
     answer = models.TextField(blank=False,null=False)
 
 class Options(models.Model):
