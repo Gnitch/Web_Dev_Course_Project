@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as django_logout
 from django.apps import apps
@@ -50,16 +50,33 @@ def quizList(request):
 
 @login_required
 def home(request):
-    class_list = Class.objects.all()
+    class_list = list(Class.objects.filter(user=request.user))
     context = {
         'class_list':class_list,
     }
     return render(request,'quiz/home.html',context)
 
+@login_required
+def classView(request,class_pk):
+    class_obj = get_object_or_404(Class,pk=class_pk)
+    participant_list = class_obj.user.all()
+    teacher_list = []
+    student_list = []
+    for each_user in participant_list :        
+        if each_user.is_superuser :
+            pass
 
+        elif str(each_user.job.status)== 'student' :
+            student_list.append(each_user)              
 
-
-
-
+        elif str(each_user.job.status)== 'teacher' :
+            teacher_list.append(each_user)
+        
+    context = {
+        'class_obj':class_obj,
+        'student_list':student_list,
+        'teacher_list':teacher_list,
+    }
+    return render(request,'quiz/class_view.html',context)
 
 

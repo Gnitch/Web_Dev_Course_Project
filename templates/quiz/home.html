@@ -9,7 +9,7 @@
 <body>
     <div>
         {% for class in class_list %}
-            <a href="">{{class.class_name}}</a>
+            <a href="{% url 'quiz:classView' class.id %}">{{class.class_name}}</a>
             <br>
         {% endfor %}
     </div>

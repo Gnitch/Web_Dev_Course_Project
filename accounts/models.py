@@ -7,7 +7,7 @@ class Job(models.Model):
         ('teacher','Teacher'),
     ]
     status = models.CharField(choices=choices_status,default='student',max_length=10)
-    user = models.ManyToManyField(User)
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
 
 class Class(models.Model):
     class_name = models.CharField(max_length=20)

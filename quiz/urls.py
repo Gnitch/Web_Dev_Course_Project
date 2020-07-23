@@ -6,6 +6,7 @@ app_name = 'quiz'
 urlpatterns = [
     path('',views.home,name='home'),
     path('form/',views.form,name='form'),
+    path('class_view/<int:class_pk>',views.classView,name='classView'),
     path('logout/',views.logout,name='logout'),
 ]
 

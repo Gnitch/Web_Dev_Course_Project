@@ -14,7 +14,6 @@ def userLogin(request):
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
             if user is not None :
-                print("User Authenticated")
                 login(request, user)
                 return redirect('/quiz/')
 
