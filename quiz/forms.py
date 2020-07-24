@@ -14,7 +14,7 @@ class QuizForm(forms.ModelForm):
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ('answer','question')
+        fields = ('question','answer')
 
     def __init__(self, *args, **kwargs):
         super(QuestionForm, self).__init__(*args, **kwargs)        
@@ -25,10 +25,14 @@ class OptionsForm(forms.ModelForm):
     class Meta:
         model = Options
         fields = ('options',)
+        widgets = {
+            'options': forms.TextInput(attrs={'name':'options'}),
+        }           
 
     def __init__(self, *args, **kwargs):
         super(OptionsForm, self).__init__(*args, **kwargs)        
-        self.fields['options'].required = True          
+        self.fields['options'].required = False    
+        self.fields['options'].help_text = 'separate two options by comma'          
 
 
 

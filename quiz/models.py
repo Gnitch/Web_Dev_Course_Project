@@ -11,6 +11,7 @@ class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     question = models.TextField(blank=False,null=False)
     answer = models.TextField(blank=False,null=False)
+    viewed = models.BooleanField(primary_key=False,blank=False,null=False,default=False)
 
 class Options(models.Model):
     options = models.TextField(blank=True,null=True)
