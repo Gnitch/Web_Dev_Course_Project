@@ -1,13 +1,29 @@
 <h3>Question</h3>
-{{question_obj.question}}        
-<ul>
+{{question_obj.question}}?   
+<br>     
+{% if action == 'check' %}
+    {% if option_list %}
     {% for option in option_list %}    
-        <li>
-            {{option}}
-        </li>
+        <input type="checkbox" name="optionList" value="{{option}}" >
+        <label>{{option}}</label>    
+        <br>
     {% endfor %}                
-</ul>     
- <a href=""><button>Next question</button></a>   
+    {% else %}
+    <input placeholder="answer" name="answer" type="text">    
+    {% endif %}
+    <p id="result"></p>
+    <button type="button" onclick="ajax_check()">Check question</button> 
+{% else %}
+
+    {% if option_list %}
+        {% for option in option_list %}                
+            <label>{{option}}</label>    
+            <br>
+        {% endfor %}                
+    {% endif %}
+    <p id="result"></p>
+    <button type="button" onclick="ajax_next()">Next question</button> 
+{% endif %}
 <br>
 <hr>
 <br>

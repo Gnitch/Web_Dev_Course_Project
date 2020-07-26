@@ -9,66 +9,86 @@
 </head>
 <body>
     {% if type == 'quiz_form' %}
+        {% if request.user.job.status == 'teacher' %}
         <h1>Form</h1>
         <form method="POST" >
             {% csrf_token %}
             {{ quiz_form|crispy }}
+            {% for class in class_list %}
+                <input type="checkbox" name="classList" value="{{class.id}}">
+                <label for="{{class.class_name}}">{{class.class_name}}</label>
+            {% endfor %}
             <button type="submit">Submit</button>        
         </form>
+        {% endif %}
     {% elif type == 'quiz_view' %}
         <h1>{{quiz_obj.title}}</h1>
         <h3>{{quiz_obj.description}}</h3>
-        {% include 'quiz/questionForm.html' %}
-        <h2>Add Question</h2>
-        <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" method="POST">
-            {% csrf_token %}
-            {{ question_form|crispy }}
-            {{ options_form|crispy }}
-            <button type="submit">Submit</button>        
-        </form>
+        {% if request.user.job.status == 'teacher' %}   
+            <br>
+            {% for question, option in teacher_question_list %}
+                <br>
+                Question{{forloop.counter}}:{{question.question}}
+                <br>                
+                Answer:{{question.answer}}
+                <br>
+                {% if option %}
+                    Options:
+                    {% for each in option %}
+                        {{each.options}}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            <br>     
+            <!-- {% if quiz_obj.make_visible == False %} -->
+                <h2>Add Question</h2>
+                <a href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}"><button>Make Quiz Visible to students</button></a>
+                <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" method="POST">
+                    {% csrf_token %}
+                    {{ question_form|crispy }}
+                    {{ options_form|crispy }}
+                    <button type="submit">Submit</button>        
+                </form>
+            <!-- {% endif %} -->
+        {% else %}
+            <div id="replaceable-content">
+                {% include 'quiz/questionForm.html' %}                
+            </div>
+        {% endif %}
     {% endif %}
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
 
-        const user_input = $("#user-input")
-        const search_icon = $('#search-icon')
-        const artists_div = $('#replaceable-content')
-        const endpoint = '/blogs/search_community/'
-        const delay_by_in_ms = 50
-        let scheduled_function = false
+        const questions_div = $('#replaceable-content')
+        const result = document.getElementById('result')
+        const endpointNextQuestion = '/quiz/view_quiz/{{quiz_obj.id}}'
+        const endpointCheckAnswer = '/quiz/check_answer/{{question_obj.id}}'
 
-        let ajax_call = function (endpoint, request_parameters) {
-            $.getJSON(endpoint, request_parameters)
-                .done(response => {
-                    // fade out the artists_div, then:
-                    // artists_div.fadeTo('slow', 0).promise().then(() => {
-                        // replace the HTML contents
-                        artists_div.html(response['html_from_view'])
-                        // fade-in the div with new contents
-                        // artists_div.fadeTo('slow', 1)
-                        // stop animating search icon
-                        search_icon.removeClass('blink')
-                    // })
-                })
+        function ajax_next(){
+            $.getJSON(endpointNextQuestion).done(response => {
+                    questions_div.html(response['html_from_view'])
+            });                 
         }
-
-
-        user_input.on('keyup', function () {
-            const request_parameters = {
-                q: $(this).val() // value of user_input: the HTML element with ID user-input
-            }
-
-            // start animating the search icon with the CSS class
-            search_icon.addClass('blink')
-
-            // if scheduled_function is NOT false, cancel the execution of the function
-            if (scheduled_function) {
-                clearTimeout(scheduled_function)
-            }
-
-            // setTimeout returns the ID of the function to be executed
-            scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
-        })
+        
+        function ajax_check() {  
+            let checked_array = '';
+            $("input:checkbox[name=optionList]:checked").each(function(){                
+                checked_array = checked_array + $(this).val() + ',';
+            });     
+            $.ajax({
+                type : 'GET',
+                url : endpointCheckAnswer,
+                data : {'checked_array':checked_array},
+                success : function (response) {
+                    questions_div.html(response['html_from_view']);
+                    result.innerHTML = response['result']
+                    console.log(result)                     
+                },
+                error : function(response) {
+                    alert("Ajax Error");
+                }
+            });
+        }
 
     </script>
 

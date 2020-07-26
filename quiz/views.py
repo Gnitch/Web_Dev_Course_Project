@@ -1,15 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as django_logout
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
 from django.apps import apps
-from .models import Quiz, Question, Options
+from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class
 from .forms import QuizForm, QuestionForm, OptionsForm
-
-Job = apps.get_model('accounts','Job')
-Class = apps.get_model('accounts','Class')
 
 @login_required
 def logout(request):
@@ -28,6 +25,11 @@ def home(request):
 @login_required
 def classView(request,class_pk):
     class_obj = get_object_or_404(Class,pk=class_pk)
+    if str(request.user.job.status) == 'student':
+        quiz_list = list(Quiz.objects.filter(make_visible=True).filter(classes=class_obj))            
+    else :
+        quiz_list = list(Quiz.objects.filter(classes=class_obj))            
+
     participant_list = class_obj.user.all()
     teacher_list = []
     student_list = []
@@ -45,6 +47,7 @@ def classView(request,class_pk):
         'class_obj':class_obj,
         'student_list':student_list,
         'teacher_list':teacher_list,
+        'quiz_list':quiz_list
     }
     return render(request,'quiz/class_view.html',context)
 
@@ -53,62 +56,101 @@ def addQuiz(request):
 
     if request.method == "POST" :
         quiz_form = QuizForm(request.POST)
-
+        classList = request.POST.getlist('classList')        
         if(quiz_form.is_valid()):
             quiz_obj = quiz_form.save()
+            for each_class in classList :
+                quiz_obj.classes.add(Class.objects.get(pk=int(each_class)))
+            quiz_obj.save()
+
         return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_obj.id)
 
+    class_list = get_list_or_404(Class,user=request.user)
     context = {
         'quiz_form':QuizForm(),
-        'type':'quiz_form'
+        'type':'quiz_form',
+        'class_list':class_list,
     }  
     return render(request, 'quiz/form.html',context)    
 
-def getOptions(question_list):
-    option_list = None
-    if len(question_list) != 0 :
-        question_obj = question_list[0]
-        option_list = list(Options.objects.filter(question_id=question_obj.id))
-        question_obj.viewed = True
-        question_obj = question_obj.save()
-        if len(option_list) != 0:
-            option_list = option_list[0]
-            options = str(option_list.options)
-            option_list = []
-            option_list = options.split(',')  
+@login_required
+def makeQuizVisible(request, quiz_id):
+    if request.user.job.status == 'teacher' :
+        quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+        quiz_obj.make_visible = True
+        quiz_obj.save()
     
-    return option_list, question_obj
+    return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_id)
+
+def getOptions(question_obj):
+    option_list = None
+    option_list = list(Options.objects.filter(question_id=question_obj.id))
+    if len(option_list) != 0:
+        option_list = option_list[0]
+        options = str(option_list.options)
+        option_list = []
+        option_list = options.split(',')  
+    return option_list
 
 @login_required
 def quizInfoTeacherView(request,quiz_id):
-    question_obj = None
-    option_list = None
-    quiz_list = list(Quiz.objects.filter(pk=quiz_id))
+    random_question_obj = None
+    teacher_question_list = None
+    option_list = []
+    if str(request.user.job.status) == 'student':
+        quiz_list = list(Quiz.objects.filter(make_visible=True).filter(pk=quiz_id))
+    else :
+        quiz_list = list(Quiz.objects.filter(pk=quiz_id))
+    
     if len(quiz_list) == 0 :
         quiz_obj = None
     else :
         quiz_obj = quiz_list[0] 
-        if request.is_ajax():
-            question_list = list(Question.objects.filter(quiz_id=quiz_id).filter(viewed=False))                    
-            option_list, question_obj = getOptions(question_list)          
-            html = render_to_string(
-                template_name='quiz/questionForm.html',
-                context = {
-                    'question_obj':question_obj,
-                    'option_list':option_list,
-                }
-            )    
-            data_dict = {"html_from_view": html}
-            return JsonResponse(data=data_dict, safe=False)                    
-        
-        question_list = list(Question.objects.filter(quiz_id=quiz_id))        
-        option_list, question_obj = getOptions(question_list)  
+        random_question_obj = None
+        if str(request.user.job.status) == 'student':
+            if not StudentQuizInfo.objects.filter(user_id=request.user.id).exists() :
+                student_quiz_info = StudentQuizInfo.objects.create(
+                    quiz_id = quiz_id,
+                    user_id = request.user.id
+                ) 
+                question_list = list(Question.objects.filter(quiz_id=quiz_id))                
+                for question in question_list :
+                    student_quiz_info.quiz_questions.add(question)
+                student_quiz_info.save()
+            question_obj_list = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))
 
+            if len(question_obj_list) != 0 :
+                if question_obj_list[0].quiz_questions.exists() :  
+                    random_question_obj = question_obj_list[0].quiz_questions.order_by('?').first()
+                    # obj[0].quiz_questions.remove(random_question_obj)
+                    option_list = getOptions(random_question_obj)
+
+            if request.is_ajax():      
+                print("AJAX_NEXT")
+                html = render_to_string(
+                    template_name='quiz/questionForm.html',
+                    context = {
+                        'question_obj':random_question_obj,
+                        'option_list':option_list,
+                        'action':'check',
+                    }
+                )    
+                data_dict = {"html_from_view": html}
+                return JsonResponse(data=data_dict, safe=False)                      
+        else :
+            question_obj_list = list(Question.objects.filter(quiz_id=quiz_id))                        
+            for question in question_obj_list :
+                option_list.append(list(Options.objects.filter(question_id=question.id)))
+
+            teacher_question_list = zip(question_obj_list,option_list)                  
+        
     context = {
-        'question_obj':question_obj,
+        'question_obj':random_question_obj,
         'option_list':option_list,
         'type':'quiz_view',
+        'action':'check',
         'quiz_obj':quiz_obj,
+        'teacher_question_list':teacher_question_list,
         'question_form':QuestionForm(),
         'options_form':OptionsForm(),        
     }
@@ -129,6 +171,64 @@ def questionFormSubmit(request,quiz_id):
             options_form_obj.save()            
 
     return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_id)
+
+@login_required
+def checkAnswer(request, question_id):
+    if request.is_ajax():      
+        result = ''
+        print("AJAX_CHECK")
+        user_ans = ''
+        user_ans = request.GET.get('checked_array')          
+        user_ans = user_ans[:-1]
+        user_answers = user_ans.split(',')        
+        random_question_obj = get_object_or_404(Question,pk=question_id)  
+        print(random_question_obj.answer) 
+        answer_list = []
+        if ',' in random_question_obj.answer :
+            answer_list = str(random_question_obj.answer).split(',')
+        else :
+            answer_list.append(random_question_obj.answer)
+
+        if len(answer_list) == 1 :
+            if str(user_answers[0]) == str(answer_list[0]):
+                result = 'correct'   
+            else :
+                result = 'incorrect'                 
+        else :
+            flag = True
+            for answer in user_answers :
+                if answer not in answer_list :
+                    flag = False
+                    break
+            if flag == True :
+                result = 'correct' 
+            else :
+                result = 'incorrect'
+
+        option_list = getOptions(random_question_obj)
+        html = render_to_string(
+            template_name='quiz/questionForm.html',
+            context = {
+                'question_obj':random_question_obj,
+                'option_list':option_list,
+                'action':'next',
+            }
+        )    
+        data_dict = {"html_from_view": html,'result':result}
+        return JsonResponse(data=data_dict, safe=False)  
+    else :
+        redirect('/quiz/')
+
+
+
+
+
+
+
+
+
+
+
 
 
 

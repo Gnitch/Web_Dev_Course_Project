@@ -22,5 +22,13 @@
     {% for each_student in student_list %}
         <li>{{each_student}}</li>
     {% endfor %}    
+    <br>
+    <hr>
+    <h2>Quiz</h2>
+    <br>    
+    {% for quiz in quiz_list %}
+        <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">{{quiz.title}}</a>
+        <br>
+    {% endfor %}
 </body>
 </html>

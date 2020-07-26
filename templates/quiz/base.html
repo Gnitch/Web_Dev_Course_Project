@@ -12,9 +12,11 @@
     <br>
     <a href="{% url 'quiz:home' %}">Home</a>
     <br>
-    <br>
-    <a href="{% url 'quiz:addQuiz' %}">Add Quiz</a>
-    <br>
+    {% if request.user.job.status == 'teacher' %}
+        <br>
+        <a href="{% url 'quiz:addQuiz' %}">Add Quiz</a>
+        <br>
+    {% endif %}        
     <hr>
     <br>
 </body>
