@@ -18,6 +18,7 @@ class Quiz(models.Model):
     description = models.TextField()
     classes = models.ManyToManyField(Class)
     make_visible = models.BooleanField(default=False)
+    total_questions = models.IntegerField(primary_key=False,default=0)
 
     def __str__(self):
         return self.title
@@ -32,6 +33,7 @@ class Options(models.Model):
     question = models.ForeignKey(Question,on_delete=models.CASCADE)
 
 class StudentQuizInfo(models.Model):
+    completed = models.BooleanField(primary_key=False,default=False)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     score = models.IntegerField(primary_key=False,default=0)
     quiz_questions = models.ManyToManyField(Question)

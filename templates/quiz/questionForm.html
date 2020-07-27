@@ -1,29 +1,19 @@
 <h3>Question</h3>
 {{question_obj.question}}?   
+{{question_obj.id}}?   
 <br>     
-{% if action == 'check' %}
+<!-- <form action="" method="GET"> -->
     {% if option_list %}
-    {% for option in option_list %}    
-        <input type="checkbox" name="optionList" value="{{option}}" >
-        <label>{{option}}</label>    
-        <br>
-    {% endfor %}                
-    {% else %}
-    <input placeholder="answer" name="answer" type="text">    
-    {% endif %}
-    <p id="result"></p>
-    <button type="button" onclick="ajax_check()">Check question</button> 
-{% else %}
-
-    {% if option_list %}
-        {% for option in option_list %}                
+        {% for option in option_list %}    
+            <input type="checkbox" name="optionList" value="{{option}}" >
             <label>{{option}}</label>    
             <br>
         {% endfor %}                
-    {% endif %}
-    <p id="result"></p>
-    <button type="button" onclick="ajax_next()">Next question</button> 
-{% endif %}
+    {% else %}
+        <input placeholder="answer" name="inputText" id="answer" type="text">    
+    {% endif %} 
+    <button  onclick="ajax_check()" type="button">Next question</button>
+<!-- </form> -->
 <br>
 <hr>
 <br>

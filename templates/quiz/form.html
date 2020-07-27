@@ -56,40 +56,37 @@
             </div>
         {% endif %}
     {% endif %}
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-
         const questions_div = $('#replaceable-content')
-        const result = document.getElementById('result')
-        const endpointNextQuestion = '/quiz/view_quiz/{{quiz_obj.id}}'
-        const endpointCheckAnswer = '/quiz/check_answer/{{question_obj.id}}'
-
-        function ajax_next(){
-            $.getJSON(endpointNextQuestion).done(response => {
-                    questions_div.html(response['html_from_view'])
-            });                 
-        }
+        let endpointNextQuestion = '/quiz/check_answer/{{question_obj.id}}'
         
         function ajax_check() {  
             let checked_array = '';
             $("input:checkbox[name=optionList]:checked").each(function(){                
                 checked_array = checked_array + $(this).val() + ',';
-            });     
+            });    
+            let inpuText = $('#answer').val()           
             $.ajax({
                 type : 'GET',
-                url : endpointCheckAnswer,
-                data : {'checked_array':checked_array},
+                url : endpointNextQuestion,
+                data : {'checked_array':checked_array,'inputText':inpuText},
                 success : function (response) {
+                    let  quiz_id = response['quiz_id']                                                                           
+                    if(quiz_id != null) {
+                        window.location.reload();
+                    }                    
                     questions_div.html(response['html_from_view']);
-                    result.innerHTML = response['result']
-                    console.log(result)                     
+                    alert(response['result']);
+                    endpointNextQuestion = '/quiz/check_answer/' +  String(response['id'])
                 },
                 error : function(response) {
                     alert("Ajax Error");
                 }
             });
         }
-
+    
     </script>
 
 </body>
