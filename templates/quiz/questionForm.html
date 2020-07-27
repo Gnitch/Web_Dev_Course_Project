@@ -1,11 +1,17 @@
 <h3>Question</h3>
 {{question_obj.question}}?   
-{{question_obj.id}}?   
+{% if question_obj.figure %}
+    <img width="200" height="200" src="{{question_obj.figure.url}}" alt="">
+{% endif %}
 <br>     
 <!-- <form action="" method="GET"> -->
     {% if option_list %}
-        {% for option in option_list %}    
-            <input type="checkbox" name="optionList" value="{{option}}" >
+        {% for option in option_list %}  
+            {% if question_obj.multiple_answer == True %}  
+                <input type="checkbox" name="optionList" value="{{option}}" >
+            {% else %}
+                <input type="radio" name="optionList" value="{{option}}" >
+            {% endif %}
             <label>{{option}}</label>    
             <br>
         {% endfor %}                

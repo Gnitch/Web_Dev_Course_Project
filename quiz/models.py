@@ -27,6 +27,8 @@ class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     question = models.TextField(blank=False,null=False)
     answer = models.TextField(blank=False,null=False)
+    multiple_answer = models.BooleanField(default=False,primary_key=False)
+    figure = models.ImageField(upload_to='quiz/figures',null=True, blank=True)
 
 class Options(models.Model):
     options = models.TextField(blank=True,null=True)

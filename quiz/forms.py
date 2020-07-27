@@ -14,12 +14,13 @@ class QuizForm(forms.ModelForm):
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ('question','answer')
+        fields = ('question','answer','figure')
 
     def __init__(self, *args, **kwargs):
         super(QuestionForm, self).__init__(*args, **kwargs)        
         self.fields['answer'].required = True  
         self.fields['question'].required = True  
+        self.fields['figure'].required = False
 
 class OptionsForm(forms.ModelForm):
     class Meta:

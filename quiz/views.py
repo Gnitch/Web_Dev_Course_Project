@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
@@ -110,7 +111,7 @@ def quizInfoTeacherView(request,quiz_id):
         quiz_obj = quiz_list[0] 
         random_question_obj = None
         if str(request.user.job.status) == 'student':
-            if not StudentQuizInfo.objects.filter(user_id=request.user.id).exists() :
+            if not StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id).exists() :
                 student_quiz_info = StudentQuizInfo.objects.create(
                     quiz_id = quiz_id,
                     user_id = request.user.id
@@ -120,7 +121,6 @@ def quizInfoTeacherView(request,quiz_id):
                     student_quiz_info.quiz_questions.add(question)
                 student_quiz_info.save()
             question_obj_list = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))
-
             if len(question_obj_list) != 0 :
                 if question_obj_list[0].quiz_questions.exists() :  
                     random_question_obj = question_obj_list[0].quiz_questions.order_by('?').first()
@@ -129,7 +129,7 @@ def quizInfoTeacherView(request,quiz_id):
                 else :
                     return redirect('quiz:getQuizResult',quiz_id=quiz_id)
 
-        else :                  
+        else :        
             question_obj_list = list(Question.objects.filter(quiz_id=quiz_id))                        
             for question in question_obj_list :
                 option_list.append(list(Options.objects.filter(question_id=question.id)))
@@ -158,12 +158,10 @@ def ansCheck(request, question_id):
     input_answer = request.GET.get('inputText') 
       
     answer_list = []        
-    print(input_answer,user_ans)
     if input_answer is not None :
         if input_answer == str(random_question_obj.answer) :
             result = 'correct'
             scoreSave(student_quiz_info)
-
 
         else :
             result = 'incorrect'
@@ -262,16 +260,39 @@ def checkAnswer(request, question_id):
     else :
         redirect('/quiz/')
 
+@login_required 
+def studentQuizResult(request, quiz_id):
+    quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+    student_list = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id))
+    user_list = []
+    for student in student_list :
+        user_list.append(get_object_or_404(User,pk=student.user_id))
 
+    student_list = zip(user_list,student_list)    
+    context = {'quiz_obj':quiz_obj,'student_list':student_list}
+    return render(request,'quiz/StudentQuizResult.html',context)
 
+@login_required
+def deleteQuestion(request, question_id):
+    question_obj = get_object_or_404(Question,pk=question_id)
+    quiz_obj = get_object_or_404(Quiz,pk=question_obj.quiz_id)    
+    if quiz_obj.make_visible == False and str(request.user.job.status) == 'teacher' :
+        Options.objects.filter(question_id=question_id).delete()
+        question_obj.delete()
 
+    return redirect('quiz:quizInfoTeacherView',quiz_id=question_obj.quiz_id)
 
-
-
-
-
-
-
+@login_required
+def deleteQuiz(request, quiz_id):
+    quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+    question_list = get_list_or_404(Question,quiz_id=quiz_id)
+    if quiz_obj.make_visible == False and str(request.user.job.status) == 'teacher' :
+        for question in question_list :
+            Options.objects.filter(question_id=question.id).delete()
+            question.delete()
+        quiz_obj.delete()
+        
+    return redirect('/quiz/')
 
 
 

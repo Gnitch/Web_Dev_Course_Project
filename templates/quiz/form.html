@@ -25,10 +25,16 @@
         <h1>{{quiz_obj.title}}</h1>
         <h3>{{quiz_obj.description}}</h3>
         {% if request.user.job.status == 'teacher' %}   
+            {% if quiz_obj.make_visible == False %}
+                <a href="{% url 'quiz:deleteQuiz' quiz_obj.id %}"><button>Delete Quiz</button></a>
+            {% endif %}        
             <br>
             {% for question, option in teacher_question_list %}
                 <br>
-                Question{{forloop.counter}}:{{question.question}}
+                Question{{forloop.counter}}:{{question.question}},                
+                {% if quiz_obj.make_visible == False %}
+                    <a href="{% url 'quiz:deleteQuestion' question.id %}"><button>Delete Question</button></a>
+                {% endif %}                  
                 <br>                
                 Answer:{{question.answer}}
                 <br>
@@ -40,7 +46,8 @@
                 {% endif %}
             {% endfor %}
             <br>     
-            <!-- {% if quiz_obj.make_visible == False %} -->
+            <a href="{% url 'quiz:studentQuizResult' quiz_obj.id %}"><button>Student score</button></a>
+            {% if quiz_obj.make_visible == False %}
                 <h2>Add Question</h2>
                 <a href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}"><button>Make Quiz Visible to students</button></a>
                 <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" method="POST">
@@ -49,7 +56,7 @@
                     {{ options_form|crispy }}
                     <button type="submit">Submit</button>        
                 </form>
-            <!-- {% endif %} -->
+            {% endif %}
         {% else %}
             <div id="replaceable-content">
                 {% include 'quiz/questionForm.html' %}                
