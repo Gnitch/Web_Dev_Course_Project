@@ -1,24 +1,24 @@
 <h3>Question</h3>
-{{question_obj.question}}?   
+{{question_obj.question}}?
 {% if question_obj.figure %}
-    <img width="200" height="200" src="{{question_obj.figure.url}}" alt="">
+<img width="200" height="200" src="{{question_obj.figure.url}}" alt="">
 {% endif %}
-<br>     
+<br>
 <!-- <form action="" method="GET"> -->
-    {% if option_list %}
-        {% for option in option_list %}  
-            {% if question_obj.multiple_answer == True %}  
-                <input type="checkbox" name="optionList" value="{{option}}" >
-            {% else %}
-                <input type="radio" name="optionList" value="{{option}}" >
-            {% endif %}
-            <label>{{option}}</label>    
-            <br>
-        {% endfor %}                
-    {% else %}
-        <input placeholder="answer" name="inputText" id="answer" type="text">    
-    {% endif %} 
-    <button  onclick="ajax_check()" type="button">Next question</button>
+{% if option_list %}
+{% for option in option_list %}
+{% if question_obj.multiple_answer == True %}
+<input type="checkbox" name="optionList" value="{{option}}">
+{% else %}
+<input type="radio" name="optionList" value="{{option}}">
+{% endif %}
+<label>{{option}}</label>
+<br>
+{% endfor %}
+{% else %}
+<input placeholder="answer" name="inputText" id="answer" type="text">
+{% endif %}
+<button onclick="ajax_check()" type="button">Next question</button>
 <!-- </form> -->
 <br>
 <hr>

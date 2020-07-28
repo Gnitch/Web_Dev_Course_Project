@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-{% load crispy_forms_tags %}
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+{% extends "../quiz/base.html" %}
+{% block content %}
 
-  <div>
-    <h1>Reset Password</h1>
-    <form method="POST">
+{% load crispy_forms_tags %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-6">
+      <h1>Reset Password</h1>
+      <form method="POST">
         {% csrf_token %}
-          {{ form|crispy }}
+        {{ form|crispy }}
         <div>
-            <button  type="submit">Request Password Reset</button>
+          <button class="btn btn-outline-primary" type="submit">Request Password Reset</button>
         </div>
-    </form>
-  </div>  
-  
-</body>
-</html>
+      </form>
+    </div>
+  </div>
+</div>
+<div>
+
+</div>
+
+{% endblock %}

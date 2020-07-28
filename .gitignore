@@ -2,3 +2,6 @@
 Quiz_system/__pycache__/
 quiz/__pycache__/
 accounts/__pycache__/
+accounts/migrations/__pycache__/
+quiz/migrations/__pycache__/
+.vscode/settings.json

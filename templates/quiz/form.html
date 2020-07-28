@@ -1,100 +1,94 @@
-<!DOCTYPE html>
+{% extends "./base.html" %}
+
+{% block content %}
 {% load crispy_forms_tags %}
-{% include 'quiz/base.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form</title>
-</head>
-<body>
+<div class="container">
     {% if type == 'quiz_form' %}
-        {% if request.user.job.status == 'teacher' %}
-        <h1>Form</h1>
-        <form method="POST" >
-            {% csrf_token %}
-            {{ quiz_form|crispy }}
-            {% for class in class_list %}
-                <input type="checkbox" name="classList" value="{{class.id}}">
-                <label for="{{class.class_name}}">{{class.class_name}}</label>
-            {% endfor %}
-            <button type="submit">Submit</button>        
-        </form>
-        {% endif %}
-    {% elif type == 'quiz_view' %}
-        <h1>{{quiz_obj.title}}</h1>
-        <h3>{{quiz_obj.description}}</h3>
-        {% if request.user.job.status == 'teacher' %}   
-            {% if quiz_obj.make_visible == False %}
-                <a href="{% url 'quiz:deleteQuiz' quiz_obj.id %}"><button>Delete Quiz</button></a>
-            {% endif %}        
-            <br>
-            {% for question, option in teacher_question_list %}
-                <br>
-                Question{{forloop.counter}}:{{question.question}},                
-                {% if quiz_obj.make_visible == False %}
-                    <a href="{% url 'quiz:deleteQuestion' question.id %}"><button>Delete Question</button></a>
-                {% endif %}                  
-                <br>                
-                Answer:{{question.answer}}
-                <br>
-                {% if option %}
-                    Options:
-                    {% for each in option %}
-                        {{each.options}}
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
-            <br>     
-            <a href="{% url 'quiz:studentQuizResult' quiz_obj.id %}"><button>Student score</button></a>
-            {% if quiz_obj.make_visible == False %}
-                <h2>Add Question</h2>
-                <a href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}"><button>Make Quiz Visible to students</button></a>
-                <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" method="POST">
-                    {% csrf_token %}
-                    {{ question_form|crispy }}
-                    {{ options_form|crispy }}
-                    <button type="submit">Submit</button>        
-                </form>
-            {% endif %}
-        {% else %}
-            <div id="replaceable-content">
-                {% include 'quiz/questionForm.html' %}                
-            </div>
-        {% endif %}
+    {% if request.user.job.status == 'teacher' %}
+    <h1>Form</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ quiz_form|crispy }}
+        {% for class in class_list %}
+        <input type="checkbox" name="classList" value="{{class.id}}">
+        <label for="{{class.class_name}}">{{class.class_name}}</label>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
     {% endif %}
+    {% elif type == 'quiz_view' %}
+    <h1>{{quiz_obj.title}}</h1>
+    <h3>{{quiz_obj.description}}</h3>
+    {% if request.user.job.status == 'teacher' %}
+    {% if quiz_obj.make_visible == False %}
+    <a href="{% url 'quiz:deleteQuiz' quiz_obj.id %}"><button>Delete Quiz</button></a>
+    {% endif %}
+    <br>
+    {% for question, option in teacher_question_list %}
+    <br>
+    Question{{forloop.counter}}:{{question.question}},
+    {% if quiz_obj.make_visible == False %}
+    <a href="{% url 'quiz:deleteQuestion' question.id %}"><button>Delete Question</button></a>
+    {% endif %}
+    <br>
+    Answer:{{question.answer}}
+    <br>
+    {% if option %}
+    Options:
+    {% for each in option %}
+    {{each.options}}
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
+    <br>
+    <a href="{% url 'quiz:studentQuizResult' quiz_obj.id %}"><button>Student score</button></a>
+    {% if quiz_obj.make_visible == False %}
+    <h2>Add Question</h2>
+    <a href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}"><button>Make Quiz Visible to students</button></a>
+    <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" method="POST">
+        {% csrf_token %}
+        {{ question_form|crispy }}
+        {{ options_form|crispy }}
+        <button type="submit">Submit</button>
+    </form>
+    {% endif %}
+    {% else %}
+    <div id="replaceable-content">
+        {% include 'quiz/questionForm.html' %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        const questions_div = $('#replaceable-content')
-        let endpointNextQuestion = '/quiz/check_answer/{{question_obj.id}}'
-        
-        function ajax_check() {  
-            let checked_array = '';
-            $("input:checkbox[name=optionList]:checked").each(function(){                
-                checked_array = checked_array + $(this).val() + ',';
-            });    
-            let inpuText = $('#answer').val()           
-            $.ajax({
-                type : 'GET',
-                url : endpointNextQuestion,
-                data : {'checked_array':checked_array,'inputText':inpuText},
-                success : function (response) {
-                    let  quiz_id = response['quiz_id']                                                                           
-                    if(quiz_id != null) {
-                        window.location.reload();
-                    }                    
-                    questions_div.html(response['html_from_view']);
-                    alert(response['result']);
-                    endpointNextQuestion = '/quiz/check_answer/' +  String(response['id'])
-                },
-                error : function(response) {
-                    alert("Ajax Error");
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    const questions_div = $('#replaceable-content')
+    let endpointNextQuestion = '/quiz/check_answer/{{question_obj.id}}'
+
+    function ajax_check() {
+        let checked_array = '';
+        $("input:checkbox[name=optionList]:checked").each(function () {
+            checked_array = checked_array + $(this).val() + ',';
+        });
+        let inpuText = $('#answer').val()
+        $.ajax({
+            type: 'GET',
+            url: endpointNextQuestion,
+            data: { 'checked_array': checked_array, 'inputText': inpuText },
+            success: function (response) {
+                let quiz_id = response['quiz_id']
+                if (quiz_id != null) {
+                    window.location.reload();
                 }
-            });
-        }
-    
-    </script>
+                questions_div.html(response['html_from_view']);
+                alert(response['result']);
+                endpointNextQuestion = '/quiz/check_answer/' + String(response['id'])
+            },
+            error: function (response) {
+                alert("Ajax Error");
+            }
+        });
+    }
 
-</body>
-</html>
+</script>
+{% endblock %}

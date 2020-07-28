@@ -1,34 +1,41 @@
-<!DOCTYPE html>
-{% include 'quiz/base.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class</title>
-</head>
-<body>
-    <h1>{{class_obj.class_name}}</h1>
-    <hr>
-    <br>
-    <h2>Teacher</h2>
-    <ul>
-        {% for each_teacher in teacher_list %}
-            <li>{{each_teacher}}</li>
-        {% endfor %}
-    </ul>
-    <hr>
-    <br>
-    <h2>Student</h2>
-    {% for each_student in student_list %}
-        <li>{{each_student}}</li>
-    {% endfor %}    
-    <br>
-    <hr>
-    <h2>Quiz</h2>
-    <br>    
-    {% for quiz in quiz_list %}
-        <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">{{quiz.title}}</a>
-        <br>
-    {% endfor %}
-</body>
-</html>
+{% extends "./base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <div class="jumbotron my-3">
+        <h1>
+            {{class_obj.class_name}}
+        </h1>
+        <h5>
+            <ul>
+                {% for each_teacher in teacher_list %}
+                <li>{{each_teacher}}</li>
+                {% endfor %}
+            </ul>
+        </h5>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <h5>Quiz</h5>
+            <ul class="list-group">
+                {% for quiz in quiz_list %}
+                <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
+                    <li class="list-group-item">{{quiz.title}}</li>
+                </a>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h5>Students </h2>
+                <ul class="list-group">
+                    {% for each_student in student_list %}
+                    <li class="list-group-item">{{each_student}}</li>
+                    {% endfor %}
+                </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
