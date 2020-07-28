@@ -20,6 +20,12 @@
     <h1>{{quiz_obj.title}}</h1>
     <h3>{{quiz_obj.description}}</h3>
     {% if request.user.job.status == 'teacher' %}
+
+    {% if quiz_obj.make_visible == True %}
+        {% if quiz_obj.answer_available == False %}
+            <a href="{% url 'quiz:quizAnswerVisible' quiz_obj.id %}"><button class="btn btn-dark">Make Answers of the quiz visible for students</button></a>    
+        {% endif %}
+    {% endif %}
     {% if quiz_obj.make_visible == False %}
     <a href="{% url 'quiz:deleteQuiz' quiz_obj.id %}"><button>Delete Quiz</button></a>
     {% endif %}

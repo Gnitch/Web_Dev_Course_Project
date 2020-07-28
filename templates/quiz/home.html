@@ -11,9 +11,12 @@
         {% for class,faculty_count,student_count,quiz_count in class_list %}
         <div class="card">
             <h3 class="card-header">{{class.class_name}}</h3>
-            Faculty Count : {{faculty_count}}
+            Faculty Count : {{faculty_count}}            
             Student Count : {{student_count}}
             Quiz Count : {{quiz_count}}
+            <br>
+            Year : {{class.year}}
+            Branch : {{class.branch}}
             <a href="{% url 'quiz:classView' class.id %}" class="stretched-link"></a>
         </div>
         {% endfor %}

@@ -11,6 +11,8 @@ class Job(models.Model):
 
 class Class(models.Model):
     class_name = models.CharField(max_length=20)
+    year = models.IntegerField(primary_key=False,null=False,blank=False)
+    branch = models.CharField(max_length=50)
     user = models.ManyToManyField(User)
 
 class Quiz(models.Model):
@@ -19,6 +21,7 @@ class Quiz(models.Model):
     classes = models.ManyToManyField(Class)
     make_visible = models.BooleanField(default=False)
     total_questions = models.IntegerField(primary_key=False,default=0)
+    answer_available = models.BooleanField(primary_key=False,default=False)
 
     def __str__(self):
         return self.title
@@ -28,7 +31,8 @@ class Question(models.Model):
     question = models.TextField(blank=False,null=False)
     answer = models.TextField(blank=False,null=False)
     multiple_answer = models.BooleanField(default=False,primary_key=False)
-    figure = models.ImageField(upload_to='quiz/figures',null=True, blank=True)
+    figure = models.ImageField(upload_to='quiz/figures',null=True, blank=True)   
+    explanation = models.TextField(null=True,blank=True) 
 
 class Options(models.Model):
     options = models.TextField(blank=True,null=True)
@@ -41,5 +45,9 @@ class StudentQuizInfo(models.Model):
     quiz_questions = models.ManyToManyField(Question)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
 
+class Comments(models.Model):
+    comment = models.TextField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    clas = models.ForeignKey(Class,on_delete=models.CASCADE)
 
 

@@ -8,8 +8,8 @@ import os
 
 import Quiz_system.settings as settings
 from django.apps import apps
-from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class
-from .forms import QuizForm, QuestionForm, OptionsForm
+from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class, Comments
+from .forms import QuizForm, QuestionForm, OptionsForm,CommentsForm
 
 @login_required
 def logout(request):
@@ -65,12 +65,24 @@ def classView(request,class_pk):
 
         elif str(each_user.job.status)== 'teacher' :
             teacher_list.append(each_user)
+
+    user_list = []
+    if Comments.objects.filter(clas_id=class_pk).exists():
+        comments = get_list_or_404(Comments,clas_id=class_pk)
+        for comment in comments :
+            user_list.append(get_object_or_404(User,pk=comment.user_id))
         
+    else :
+        comments = []
+
+    user_comments_list = zip(user_list,comments)
     context = {
         'class_obj':class_obj,
         'student_list':student_list,
         'teacher_list':teacher_list,
-        'quiz_list':quiz_list
+        'quiz_list':quiz_list,
+        'comments_form':CommentsForm(),   
+        'user_comments_list':user_comments_list,       
     }
     return render(request,'quiz/class_view.html',context)
 
@@ -103,6 +115,16 @@ def makeQuizVisible(request, quiz_id):
         quiz_obj.make_visible = True
         question_list = get_list_or_404(Question,quiz_id=quiz_id)
         quiz_obj.total_questions = len(question_list)
+        quiz_obj.save()        
+    
+    return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_id)
+
+@login_required
+def quizAnswerVisible(request, quiz_id):
+    if request.user.job.status == 'teacher' :
+        print("YEss")
+        quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+        quiz_obj.answer_available = True       
         quiz_obj.save()        
     
     return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_id)
@@ -144,6 +166,9 @@ def quizInfoTeacherView(request,quiz_id):
                 student_quiz_info.save()
             question_obj_list = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))
             if len(question_obj_list) != 0 :
+                if quiz_obj.answer_available == True :
+                    return redirect('quiz:quizAnswer',stud_quiz_info_id=question_obj_list[0].id,quiz_id=quiz_id)
+
                 if question_obj_list[0].quiz_questions.exists() :  
                     random_question_obj = question_obj_list[0].quiz_questions.order_by('?').first()
                     option_list = getOptions(random_question_obj)                    
@@ -166,7 +191,7 @@ def quizInfoTeacherView(request,quiz_id):
         'quiz_obj':quiz_obj,
         'teacher_question_list':teacher_question_list,
         'question_form':QuestionForm(),
-        'options_form':OptionsForm(),        
+        'options_form':OptionsForm(),      
     }
     return render(request,'quiz/form.html',context)
 
@@ -322,10 +347,29 @@ def deleteQuiz(request, quiz_id):
         
     return redirect('/quiz/')
 
+@login_required
+def postComment(request,class_id) :
+    if request.method == 'POST' :
+        form = CommentsForm(request.POST)
+        if form.is_valid() :
+            form_obj = form.save(commit=False)
+            form_obj.user_id = request.user.id
+            form_obj.clas_id = class_id
+            form_obj.save()
 
+    return redirect('quiz:classView',class_pk=class_id)
 
+@login_required
+def quizAnswer(request,stud_quiz_info_id,quiz_id):
+    quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+    if quiz_obj.answer_available == True :
+        stud_quiz_info_obj = get_object_or_404(StudentQuizInfo,pk=stud_quiz_info_id)
+        quesion_list = get_list_or_404(Question,quiz_id=quiz_id)
+        context = {'quiz_obj':quiz_obj,'stud_quiz_info_obj':stud_quiz_info_obj,'quesion_list':quesion_list}
+        return render(request, 'quiz/quizAnswer.html',context)        
 
-
+    else :
+        return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_id)
 
 
 
