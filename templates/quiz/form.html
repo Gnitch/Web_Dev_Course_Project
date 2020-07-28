@@ -1,5 +1,5 @@
 {% extends "./base.html" %}
-
+{% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
 <div class="container">
@@ -27,6 +27,9 @@
     {% for question, option in teacher_question_list %}
     <br>
     Question{{forloop.counter}}:{{question.question}},
+    {% if question.figure %}
+        <img width="200" height="200" src="{{question.figure.url}}" alt="">
+    {% endif %}
     {% if quiz_obj.make_visible == False %}
     <a href="{% url 'quiz:deleteQuestion' question.id %}"><button>Delete Question</button></a>
     {% endif %}
@@ -44,8 +47,13 @@
     <a href="{% url 'quiz:studentQuizResult' quiz_obj.id %}"><button>Student score</button></a>
     {% if quiz_obj.make_visible == False %}
     <h2>Add Question</h2>
+
+
+    <strong>// 'button:makeQuizVisible' select kelyar quiz edit nai karu shakat aya note tak//</strong>
+
+
     <a href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}"><button>Make Quiz Visible to students</button></a>
-    <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" method="POST">
+    <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         {{ question_form|crispy }}
         {{ options_form|crispy }}

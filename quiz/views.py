@@ -4,7 +4,9 @@ from django.contrib.auth import logout as django_logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+import os
 
+import Quiz_system.settings as settings
 from django.apps import apps
 from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class
 from .forms import QuizForm, QuestionForm, OptionsForm
@@ -18,10 +20,30 @@ def logout(request):
 @login_required
 def home(request):
     class_list = list(Class.objects.filter(user=request.user))
+    faculty_count = []
+    student_count = []
+    quiz_count = []
+    for each in class_list :
+        temp_teach = []
+        temp_stud = []
+        for user in each.user.all():
+            if str(user.job.status) == 'teacher' :
+                temp_teach.append(user)
+            else :
+                temp_stud.append(user)
+
+        faculty_count.append(len(temp_teach))
+        student_count.append(len(temp_stud))
+        temp_teach.clear()
+        temp_stud.clear()
+        quiz_count.append(Quiz.objects.filter(make_visible=True).filter(classes=each).count())
+
+    class_info = zip(class_list,faculty_count,student_count,quiz_count)
     context = {
-        'class_list':class_list,
+        'class_list':class_info
     }
     return render(request,'quiz/home.html',context)
+
 
 @login_required
 def classView(request,class_pk):
@@ -203,7 +225,7 @@ def getQuizResult(request, quiz_id):
 @login_required
 def questionFormSubmit(request,quiz_id):
     if request.method == 'POST':
-        question_form = QuestionForm(request.POST)
+        question_form = QuestionForm(request.POST,request.FILES)
         question_form_obj = question_form.save(commit=False)
         question_form_obj.quiz_id = quiz_id
         question_form_obj.save()                   
@@ -278,6 +300,9 @@ def deleteQuestion(request, question_id):
     quiz_obj = get_object_or_404(Quiz,pk=question_obj.quiz_id)    
     if quiz_obj.make_visible == False and str(request.user.job.status) == 'teacher' :
         Options.objects.filter(question_id=question_id).delete()
+        if question_obj.figure is not None :
+            os.remove(os.path.join(settings.MEDIA_ROOT,str(question_obj.figure.name)))
+            
         question_obj.delete()
 
     return redirect('quiz:quizInfoTeacherView',quiz_id=question_obj.quiz_id)
@@ -289,6 +314,9 @@ def deleteQuiz(request, quiz_id):
     if quiz_obj.make_visible == False and str(request.user.job.status) == 'teacher' :
         for question in question_list :
             Options.objects.filter(question_id=question.id).delete()
+            if question.figure is not None :
+                os.remove(os.path.join(settings.MEDIA_ROOT,str(question.figure.name)))            
+            
             question.delete()
         quiz_obj.delete()
         

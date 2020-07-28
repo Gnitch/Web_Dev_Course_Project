@@ -2,11 +2,18 @@
 
 {% block content %}
 
+
+<strong >Je quiz student la visible hat tes quiz count kelyat</strong>
+
+
 <div class="container ">
     <div class="card-deck py-5">
-        {% for class in class_list %}
+        {% for class,faculty_count,student_count,quiz_count in class_list %}
         <div class="card">
             <h3 class="card-header">{{class.class_name}}</h3>
+            Faculty Count : {{faculty_count}}
+            Student Count : {{student_count}}
+            Quiz Count : {{quiz_count}}
             <a href="{% url 'quiz:classView' class.id %}" class="stretched-link"></a>
         </div>
         {% endfor %}
@@ -15,4 +22,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
