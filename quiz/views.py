@@ -98,7 +98,7 @@ def addQuiz(request):
                 quiz_obj.classes.add(Class.objects.get(pk=int(each_class)))
             quiz_obj.save()
 
-        return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_obj.id)
+            return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_obj.id)
 
     class_list = get_list_or_404(Class,user=request.user)
     context = {
@@ -272,7 +272,9 @@ def checkAnswer(request, question_id):
         random_question_obj = None
         option_list = None
         result = ansCheck(request,question_id)
-        question_obj = get_object_or_404(Question,pk=question_id)        
+        question_obj = get_object_or_404(Question,pk=question_id)   
+        quiz = get_object_or_404(Quiz,pk=question_obj.quiz_id)     
+        print(quiz.title)
         question_obj_list = list(StudentQuizInfo.objects.filter(quiz_id=question_obj.quiz_id).filter(user_id=request.user.id))
 
         if len(question_obj_list) != 0 :
@@ -285,6 +287,7 @@ def checkAnswer(request, question_id):
                 html = render_to_string(
                     template_name='quiz/questionForm.html',
                     context = {
+                        'quiz_obj':quiz,
                         'question_obj':random_question_obj,
                         'option_list':option_list,
                     }

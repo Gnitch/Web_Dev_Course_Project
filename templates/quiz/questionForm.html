@@ -1,3 +1,4 @@
+<p id="demo"></p>
 <h3>{{question_obj.question}}?</h3>
 {% if question_obj.figure %}
 <img class="d-block img-fluid" width="200" height="200" src="{{question_obj.figure.url}}" alt="">
@@ -16,4 +17,22 @@
 {% else %}
 <input placeholder="answer" name="inputText" id="answer" type="text">
 {% endif %}
-<button class="btn btn-sm btn-outline-primary" onclick="ajax_check()" type="button">Next question</button>
+{% if quiz_obj.timer %}
+{% else %}
+    <button class="btn btn-sm btn-outline-primary" onclick="ajax_check" type="button">Next question</button>
+{% endif %}
+
+
+<script>
+  time =  parseInt('{{quiz_obj.timer}}');
+  clearInterval(x);
+  var x = setInterval(function() {
+    document.getElementById("demo").innerHTML = time;
+    time = time -1;
+    if (time < 0) {
+      clearInterval(x);
+    }
+  }, 1000);
+</script>
+
+

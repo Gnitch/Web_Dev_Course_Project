@@ -5,11 +5,14 @@ from .models import Quiz, Question, Options, Comments
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
-        fields = ('title','description')
+        fields = ('title','description','timer',)
 
     def __init__(self, *args, **kwargs):
         super(QuizForm, self).__init__(*args, **kwargs)        
         self.fields['title'].required = True  
+        self.fields['description'].required = False 
+        self.fields['timer'].required = False
+        self.fields['timer'].help_text = "Keep input blank if no timer is required and time should be between '20 < time < 40' sec"
 
 class QuestionForm(forms.ModelForm):
     class Meta:
