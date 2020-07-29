@@ -1,27 +1,21 @@
 {% extends "./base.html" %}
 
 {% block content %}
-
-    <h1>{{quiz_obj.title}}</h1>
-    <h3>{{quiz_obj.description}}</h3>
-    Score : {{stud_quiz_info_obj.score}}/{{quiz_obj.total_questions}}
-    <br>
-    <ul>
-        {% for question in quesion_list %}
-            <li>
-                {{question.question}}?<br>
-                {% if question.figure %}
-                    <img width="200" height="200" src="{{question.figure.url}}" alt="">
-                {% endif %}
-                ans: {{question.answer}} <br>
-                explanation: {{question.explanation}}
-            </li>            
-        {% endfor %}
-    </ul>
+<h1>{{quiz_obj.title}}</h1>
+<h3>{{quiz_obj.description}}</h3>
+Score : {{stud_quiz_info_obj.score}}/{{quiz_obj.total_questions}}
+<br>
+<ul>
+    {% for question in quesion_list %}
+    <li>
+        {{question.question}}?<br>
+        {% if question.figure %}
+        <img width="200" height="200" src="{{question.figure.url}}" alt="">
+        {% endif %}
+        ans: {{question.answer}} <br>
+        explanation: {{question.explanation}}
+    </li>
+    {% endfor %}
+</ul>
 
 {% endblock %}
-
-
-
-
-

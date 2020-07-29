@@ -2,22 +2,29 @@
 
 {% block content %}
 
-
-<strong >Je quiz student la visible hat tes quiz count kelyat</strong>
-
-
 <div class="container ">
-    <div class="card-deck py-5">
+    <div class="row py-5">
         {% for class,faculty_count,student_count,quiz_count in class_list %}
-        <div class="card">
-            <h3 class="card-header">{{class.class_name}}</h3>
-            Faculty Count : {{faculty_count}}            
-            Student Count : {{student_count}}
-            Quiz Count : {{quiz_count}}
-            <br>
-            Year : {{class.year}}
-            Branch : {{class.branch}}
-            <a href="{% url 'quiz:classView' class.id %}" class="stretched-link"></a>
+        <div class="col-md-4">
+            <div class="card">
+                <h3 class="card-header">{{class.class_name}}</h3>
+                <div class="card-body">
+                    <div>
+                        <strong>Faculty Count: </strong>{{faculty_count}}
+                    </div>
+                    <div>
+                        <strong>Students: </strong>{{student_count}}
+                    </div>
+                    <div>
+                        <strong>Quiz Count: </strong>{{quiz_count}}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    Year: {{class.year}}
+                    Branch: {{class.branch}}
+                </div>
+                <a href="{% url 'quiz:classView' class.id %}" class="stretched-link"></a>
+            </div>
         </div>
         {% endfor %}
         <div class="col-md-3">

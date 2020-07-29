@@ -18,60 +18,70 @@
     {% endif %}
     {% elif type == 'quiz_view' %}
     <h1>{{quiz_obj.title}}</h1>
-    <h3>{{quiz_obj.description}}</h3>
-    {% if request.user.job.status == 'teacher' %}
-
-    {% if quiz_obj.make_visible == True %}
+    <h4 class="text-secondary">{{quiz_obj.description}}</h3>
+        {% if request.user.job.status == 'teacher' %}
+        {% if quiz_obj.make_visible == True %}
         {% if quiz_obj.answer_available == False %}
-            <a href="{% url 'quiz:quizAnswerVisible' quiz_obj.id %}"><button class="btn btn-dark">Make Answers of the quiz visible for students</button></a>    
+        <a class="btn btn-primary" role="button" href="{% url 'quiz:quizAnswerVisible' quiz_obj.id %}">Make Answers of
+            the quiz
+            visible for students</a>
         {% endif %}
-    {% endif %}
-    {% if quiz_obj.make_visible == False %}
-    <a href="{% url 'quiz:deleteQuiz' quiz_obj.id %}"><button>Delete Quiz</button></a>
-    {% endif %}
-    <br>
-    {% for question, option in teacher_question_list %}
-    <br>
-    Question{{forloop.counter}}:{{question.question}},
-    {% if question.figure %}
-        <img width="200" height="200" src="{{question.figure.url}}" alt="">
-    {% endif %}
-    {% if quiz_obj.make_visible == False %}
-    <a href="{% url 'quiz:deleteQuestion' question.id %}"><button>Delete Question</button></a>
-    {% endif %}
-    <br>
-    Answer:{{question.answer}}
-    <br>
-    {% if option %}
-    Options:
-    {% for each in option %}
-    {{each.options}}
-    {% endfor %}
-    {% endif %}
-    {% endfor %}
-    <br>
-    <a href="{% url 'quiz:studentQuizResult' quiz_obj.id %}"><button>Student score</button></a>
-    {% if quiz_obj.make_visible == False %}
-    <h2>Add Question</h2>
-
-
-    <strong>// 'button:makeQuizVisible' select kelyar quiz edit nai karu shakat aya note tak//</strong>
-
-
-    <a href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}"><button>Make Quiz Visible to students</button></a>
-    <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" enctype="multipart/form-data" method="POST">
-        {% csrf_token %}
-        {{ question_form|crispy }}
-        {{ options_form|crispy }}
-        <button type="submit">Submit</button>
-    </form>
-    {% endif %}
-    {% else %}
-    <div id="replaceable-content">
-        {% include 'quiz/questionForm.html' %}
-    </div>
-    {% endif %}
-    {% endif %}
+        {% endif %}
+        {% if quiz_obj.make_visible == False %}
+        <a class="btn btn-danger" role="button" href="{% url 'quiz:deleteQuiz' quiz_obj.id %}">Delete Quiz</a>
+        {% endif %}
+        <br>
+        <br>
+        <!-- Questions preview  -->
+        <div class="container">
+            <div class="row">
+                {% for question, option in teacher_question_list %}
+                <div class="col-md-3 border">
+                    <br>
+                    <b>{{question.question}}</b>
+                    {% if question.figure %}
+                    <img class="d-block img-fluid   " width="150" height="150" src="{{question.figure.url}}" alt="">
+                    {% endif %}
+                    <br>
+                    {% if quiz_obj.make_visible == False %}
+                    <a class="text-danger" href="{% url 'quiz:deleteQuestion' question.id %}"><i
+                            class="fa fa-trash"></i></a>
+                    {% endif %}
+                    <br>
+                    <strong>Answer: </strong>{{question.answer}}
+                    <br>
+                    {% if option %}
+                    <strong>Options: </strong>
+                    <ul>
+                        {% for each in option %}
+                        <li>{{each.options}}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <br>
+        <a class="btn btn-success" href="{% url 'quiz:studentQuizResult' quiz_obj.id %}">Student score</a>
+        {% if quiz_obj.make_visible == False %}
+        <h2>Add Question</h2>
+        <span class="text-danger">You cannot edit quiz once it is live. </span><a class="btn btn-outline-primary"
+            href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}">Make Quiz Visible to
+            students</a>
+        <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            {{ question_form|crispy }}
+            {{ options_form|crispy }}
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+        {% endif %}
+        {% else %}
+        <div id="replaceable-content">
+            {% include 'quiz/questionForm.html' %}
+        </div>
+        {% endif %}
+        {% endif %}
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

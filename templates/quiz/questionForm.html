@@ -1,10 +1,8 @@
-<h3>Question</h3>
-{{question_obj.question}}?
+<h3>{{question_obj.question}}?</h3>
 {% if question_obj.figure %}
-    <img width="200" height="200" src="{{question_obj.figure.url}}" alt="">
+<img class="d-block img-fluid" width="200" height="200" src="{{question_obj.figure.url}}" alt="">
 {% endif %}
 <br>
-<!-- <form action="" method="GET"> -->
 {% if option_list %}
 {% for option in option_list %}
 {% if question_obj.multiple_answer == True %}
@@ -18,8 +16,4 @@
 {% else %}
 <input placeholder="answer" name="inputText" id="answer" type="text">
 {% endif %}
-<button onclick="ajax_check()" type="button">Next question</button>
-<!-- </form> -->
-<br>
-<hr>
-<br>
+<button class="btn btn-sm btn-outline-primary" onclick="ajax_check()" type="button">Next question</button>

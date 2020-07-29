@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-{% include 'quiz/base.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends "./base.html" %}
+{% block content %}
+<div class="container">
     <h1>{{quiz_obj.title}}</h1>
     <h3>{{quiz_obj.description}}</h3>
     <h4>Quiz Completed</h4>
     <h4>Score:{{student_quiz_info.score}}/{{quiz_obj.total_questions}}</h4>
-</body>
-</html>
+</div>
+{% endblock %}
