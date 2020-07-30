@@ -52,12 +52,19 @@ def classView(request,class_pk):
     else :
         quiz_list = list(Quiz.objects.filter(classes=class_obj))            
 
+    # student_quiz_info = []
+    # if len(quiz_list) != 0:
+    #     for quiz in quiz_list :
+    #         stud_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))            
+    #         if len(stud_info) != 0 :
+
+
     participant_list = class_obj.user.all()
     teacher_list = []
     student_list = []
     for each_user in participant_list :        
         if each_user.is_superuser :
-            pass
+            list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))            
 
         elif str(each_user.job.status)== 'student' :
             student_list.append(each_user)              
