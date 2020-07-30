@@ -47,20 +47,23 @@ def home(request):
 @login_required
 def classView(request,class_pk):
     stud_info = []
-    student_quiz_info = []
+    quiz_info = []
     class_obj = get_object_or_404(Class,pk=class_pk)
     if str(request.user.job.status) == 'student':
         quiz_list = list(Quiz.objects.filter(make_visible=True).filter(classes=class_obj))            
+        student_quiz_info = []
         if len(quiz_list) != 0:
             for quiz in quiz_list :
                 stud_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz.id).filter(user_id=request.user.id))            
                 if len(stud_info) != 0 :
-                    student_quiz_info.append(stud_info[0])        
+                    student_quiz_info.append(stud_info[0])  
+                else :
+                    student_quiz_info.append(None)
+
+        quiz_info = zip(quiz_list,student_quiz_info)      
     else :
         quiz_list = list(Quiz.objects.filter(classes=class_obj))            
 
-
-    print(stud_info)
     participant_list = class_obj.user.all()
     teacher_list = []
     student_list = []
@@ -85,8 +88,7 @@ def classView(request,class_pk):
 
     user_comments_list = zip(user_list,comments)
     context = {
-        'student_quiz_info':student_quiz_info,
-        'stud_info':stud_info,
+        'quiz_info':quiz_info,
         'class_obj':class_obj,
         'student_list':student_list,
         'teacher_list':teacher_list,
@@ -262,6 +264,8 @@ def scoreSave(student_quiz_info):
 @login_required
 def getQuizResult(request, quiz_id):
     student_quiz_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))[0]
+    student_quiz_info.completed = True
+    student_quiz_info.save()
     quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
     context = {'student_quiz_info':student_quiz_info,'quiz_obj':quiz_obj}
     return render(request, 'quiz/quizResult.html',context)
@@ -295,7 +299,7 @@ def checkAnswer(request, question_id):
         quiz = get_object_or_404(Quiz,pk=question_obj.quiz_id)     
         print(quiz.title)
         question_obj_list = list(StudentQuizInfo.objects.filter(quiz_id=question_obj.quiz_id).filter(user_id=request.user.id))
-
+        print(question_obj_list[0].id)
         if len(question_obj_list) != 0 :
             question_obj_list[0].quiz_questions.remove(question_obj)
             print(question_obj_list[0].quiz_questions.all())            

@@ -20,11 +20,25 @@
         <div class="col-md-8">
             <h5>Quiz</h5>
             <ul class="list-group">
-                {% for quiz in quiz_list %}
-                <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
-                    <li class="list-group-item">{{quiz.title}}</li>
-                </a>
-                {% endfor %}
+                {% if request.user.job.status == 'student' %}
+                    {% for quiz, info in quiz_info %}
+                    <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
+                        <li class="list-group-item">{{quiz.title}}</li>
+                        {% if info.completed == True %}
+                            <h3>completed</h3>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    {% for quiz in quiz_list %}
+                    <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
+                        <li class="list-group-item">{{quiz.title}}</li>
+                        {% if quiz.make_visible == True %}
+                            <h3>visible</h3>
+                        {% endif %}
+                    </a>
+                    {% endfor %}                                     
+                {% endif %}
             </ul>
         </div>
         <div class="col-md-4">
