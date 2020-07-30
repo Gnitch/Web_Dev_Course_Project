@@ -1,0 +1,25 @@
+.comments-box {
+    width: auto;
+    height: 350px;    
+    border: 1px solid lightgray;
+    overflow: scroll;
+    margin-bottom: 20px;
+}
+.username {
+    font-size: 17px;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    margin-left: 5px;
+}
+
+.comment {
+    margin-bottom: 8px;
+    margin-top: 0px;
+    margin-left: 20px;
+    font-size: 17px;
+}
+
+
+
+
+

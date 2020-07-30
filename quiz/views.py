@@ -7,7 +7,6 @@ from django.template.loader import render_to_string
 import os
 
 import Quiz_system.settings as settings
-from django.apps import apps
 from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class, Comments
 from .forms import QuizForm, QuestionForm, OptionsForm,CommentsForm
 
@@ -69,7 +68,7 @@ def classView(request,class_pk):
     user_list = []
     if Comments.objects.filter(clas_id=class_pk).exists():
         comments = get_list_or_404(Comments,clas_id=class_pk)
-        for comment in comments :
+        for comment in comments :            
             user_list.append(get_object_or_404(User,pk=comment.user_id))
         
     else :
@@ -355,12 +354,20 @@ def postComment(request,class_id) :
     if request.method == 'POST' :
         form = CommentsForm(request.POST)
         if form.is_valid() :
-            form_obj = form.save(commit=False)
+            form_obj = form.save(commit=False)   
             form_obj.user_id = request.user.id
             form_obj.clas_id = class_id
             form_obj.save()
 
     return redirect('quiz:classView',class_pk=class_id)
+
+
+@login_required
+def deleteComment(request, comment_id):
+    comment_obj = get_object_or_404(Comments,pk=comment_id)
+    class_obj = get_object_or_404(Class,pk=comment_obj.clas_id)
+    comment_obj.delete()
+    return redirect('quiz:classView',class_pk=class_obj.id)
 
 @login_required
 def quizAnswer(request,stud_quiz_info_id,quiz_id):

@@ -23,7 +23,7 @@ class Quiz(models.Model):
     make_visible = models.BooleanField(default=False)
     total_questions = models.IntegerField(primary_key=False,default=0)
     answer_available = models.BooleanField(primary_key=False,default=False)
-    timer = models.IntegerField(primary_key=False,null=True,blank=True,validators=[MinValueValidator(20), MaxValueValidator(40)],)
+    timer = models.IntegerField(primary_key=False,null=True,blank=True,validators=[MinValueValidator(9), MaxValueValidator(31)],)
 
     def __str__(self):
         return self.title
@@ -50,6 +50,7 @@ class StudentQuizInfo(models.Model):
 class Comments(models.Model):
     comment = models.TextField()
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+    spam = models.BooleanField(null=True,blank=True,primary_key=False)
     clas = models.ForeignKey(Class,on_delete=models.CASCADE)
 
 

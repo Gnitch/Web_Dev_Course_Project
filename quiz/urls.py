@@ -17,6 +17,7 @@ urlpatterns = [
     path('view_quiz/<int:quiz_id>',views.quizInfoTeacherView,name='quizInfoTeacherView'),
     path('class_view/<int:class_pk>',views.classView,name='classView'),
     path('post_comment/<int:class_id>',views.postComment,name='postComment'),
+    path('delete_comment/<int:comment_id>',views.deleteComment,name='deleteComment'),
     path('quiz_answer/<int:stud_quiz_info_id>/<int:quiz_id>',views.quizAnswer,name='quizAnswer'),    
     path('logout/',views.logout,name='logout'),
 ]

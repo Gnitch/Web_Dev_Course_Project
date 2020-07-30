@@ -12,7 +12,7 @@ class QuizForm(forms.ModelForm):
         self.fields['title'].required = True  
         self.fields['description'].required = False 
         self.fields['timer'].required = False
-        self.fields['timer'].help_text = "Keep input blank if no timer is required and time should be between '20 < time < 40' sec"
+        self.fields['timer'].help_text = "Keep input blank if no timer is required and time should be between '10 < time < 30' sec"
 
 class QuestionForm(forms.ModelForm):
     class Meta:
@@ -45,8 +45,12 @@ class CommentsForm(forms.ModelForm) :
         model = Comments
         fields = ('comment',)
         widgets = {
-            'comment':forms.TextInput(attrs={'class': 'form-comments','placeholder':'Enter Text'})
+            'comment':forms.TextInput(attrs={'class': 'form-comments','placeholder':'Enter Comment'})
         }
+        labels ={
+            'comment' : (''),            
+        }          
+
     def __init__(self, *args, **kwargs):
         super(CommentsForm, self).__init__(*args, **kwargs)
         self.fields['comment'].required=True 
