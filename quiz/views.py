@@ -46,10 +46,11 @@ def home(request):
 
 @login_required
 def classView(request,class_pk):
+    stud_info = []
+    student_quiz_info = []
     class_obj = get_object_or_404(Class,pk=class_pk)
     if str(request.user.job.status) == 'student':
         quiz_list = list(Quiz.objects.filter(make_visible=True).filter(classes=class_obj))            
-        student_quiz_info = []
         if len(quiz_list) != 0:
             for quiz in quiz_list :
                 stud_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz.id).filter(user_id=request.user.id))            
@@ -150,6 +151,7 @@ def getOptions(question_obj):
 
 @login_required
 def quizInfoTeacherView(request,quiz_id):
+    student_list = []
     random_question_obj = None
     teacher_question_list = None
     option_list = []
@@ -190,9 +192,17 @@ def quizInfoTeacherView(request,quiz_id):
             for question in question_obj_list :
                 option_list.append(list(Options.objects.filter(question_id=question.id)))
 
+            quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+            student_list = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id))
+            user_list = []
+            for student in student_list :
+                user_list.append(get_object_or_404(User,pk=student.user_id))
+
+            student_list = zip(user_list,student_list)   
             teacher_question_list = zip(question_obj_list,option_list)                  
         
     context = {
+        'student_list':student_list,
         'question_obj':random_question_obj,
         'option_list':option_list,
         'type':'quiz_view',

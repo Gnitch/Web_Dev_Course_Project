@@ -3,7 +3,6 @@
 {% block content %}
 {% load crispy_forms_tags %}
 
-
 <div class="container">
     {% if type == 'quiz_form' %}
     {% if request.user.job.status == 'teacher' %}
@@ -65,7 +64,8 @@
             </div>
         </div>
         <br>
-        <a class="btn btn-success" href="{% url 'quiz:studentQuizResult' quiz_obj.id %}">Student score</a>
+        {% include './StudentQuizResult.html' %}
+        <!-- <a class="btn btn-success" href="{% url 'quiz:studentQuizResult' quiz_obj.id %}">Student score</a> -->
         {% if quiz_obj.make_visible == False %}
         <h2>Add Question</h2>
         <span class="text-danger">You cannot edit quiz once it is live. </span><a class="btn btn-outline-primary"
