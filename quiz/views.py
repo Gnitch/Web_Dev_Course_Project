@@ -49,22 +49,23 @@ def classView(request,class_pk):
     class_obj = get_object_or_404(Class,pk=class_pk)
     if str(request.user.job.status) == 'student':
         quiz_list = list(Quiz.objects.filter(make_visible=True).filter(classes=class_obj))            
+        student_quiz_info = []
+        if len(quiz_list) != 0:
+            for quiz in quiz_list :
+                stud_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz.id).filter(user_id=request.user.id))            
+                if len(stud_info) != 0 :
+                    student_quiz_info.append(stud_info[0])        
     else :
         quiz_list = list(Quiz.objects.filter(classes=class_obj))            
 
-    # student_quiz_info = []
-    # if len(quiz_list) != 0:
-    #     for quiz in quiz_list :
-    #         stud_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))            
-    #         if len(stud_info) != 0 :
 
-
+    print(stud_info)
     participant_list = class_obj.user.all()
     teacher_list = []
     student_list = []
     for each_user in participant_list :        
         if each_user.is_superuser :
-            list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))            
+            pass
 
         elif str(each_user.job.status)== 'student' :
             student_list.append(each_user)              
@@ -83,6 +84,8 @@ def classView(request,class_pk):
 
     user_comments_list = zip(user_list,comments)
     context = {
+        'student_quiz_info':student_quiz_info,
+        'stud_info':stud_info,
         'class_obj':class_obj,
         'student_list':student_list,
         'teacher_list':teacher_list,
