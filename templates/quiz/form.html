@@ -2,6 +2,7 @@
 {% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
+
 <div class="container">
     {% if type == 'quiz_form' %}
     {% if request.user.job.status == 'teacher' %}
@@ -17,7 +18,7 @@
     </form>
     {% endif %}
     {% elif type == 'quiz_view' %}
-    <h1>{{quiz_obj.title}}</h1>
+    <h1 class="d-inline">{{quiz_obj.title}}</h1>
     <h4 class="text-secondary">{{quiz_obj.description}}</h3>
         {% if request.user.job.status == 'teacher' %}
         {% if quiz_obj.make_visible == True %}
@@ -36,9 +37,8 @@
         <div class="container">
             <div class="row">
                 {% for question, option in teacher_question_list %}
-                <div class="col-md-3 border">
-                    <br>
-                    <b>{{question.question}}</b>
+                <div class="col-md-6">
+                    Question: <b>{{question.question}}</b>
                     {% if question.figure %}
                     <img class="d-block img-fluid   " width="150" height="150" src="{{question.figure.url}}" alt="">
                     {% endif %}
@@ -48,7 +48,7 @@
                             class="fa fa-trash"></i></a>
                     {% endif %}
                     <br>
-                    <strong>Answer: </strong>{{question.answer}}
+                    Answer: <strong>{{question.answer}}</strong>
                     <br>
                     {% if option %}
                     <strong>Options: </strong>
@@ -63,7 +63,8 @@
             </div>
         </div>
         <br>
-        <a class="btn btn-success" href="{% url 'quiz:studentQuizResult' quiz_obj.id %}">Student score</a>
+        {% include './StudentQuizResult.html' %}
+        <!-- <a class="btn btn-success" href="{% url 'quiz:studentQuizResult' quiz_obj.id %}">Student score</a> -->
         {% if quiz_obj.make_visible == False %}
         <h2>Add Question</h2>
         <span class="text-danger">You cannot edit quiz once it is live. </span><a class="btn btn-outline-primary"
