@@ -49,6 +49,13 @@
           </a>
         </li>
         {% endif %}
+
+        <li class="nav-item active">
+            <span class="nav_link text-light">
+              {% if user.is_authenticated %} {{request.user.username}} {% endif %}
+            </span>
+            <span class="sr-only">(current)</span>
+        </li        
       </ul>
     </div>
   </nav>

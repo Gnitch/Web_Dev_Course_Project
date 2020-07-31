@@ -48,57 +48,58 @@ def home(request):
 
 
 @login_required
-def classView(request, class_pk):
+def classView(request,class_pk):
     stud_info = []
-    student_quiz_info = []
-    class_obj = get_object_or_404(Class, pk=class_pk)
+    quiz_info = []
+    class_obj = get_object_or_404(Class,pk=class_pk)
     if str(request.user.job.status) == 'student':
-        quiz_list = list(Quiz.objects.filter(
-            make_visible=True).filter(classes=class_obj))
+        quiz_list = list(Quiz.objects.filter(make_visible=True).filter(classes=class_obj))            
+        student_quiz_info = []
         if len(quiz_list) != 0:
-            for quiz in quiz_list:
-                stud_info = list(StudentQuizInfo.objects.filter(
-                    quiz_id=quiz.id).filter(user_id=request.user.id))
-                if len(stud_info) != 0:
-                    student_quiz_info.append(stud_info[0])
-    else:
-        quiz_list = list(Quiz.objects.filter(classes=class_obj))
+            for quiz in quiz_list :
+                stud_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz.id).filter(user_id=request.user.id))            
+                if len(stud_info) != 0 :
+                    student_quiz_info.append(stud_info[0])  
+                else :
+                    student_quiz_info.append(None)
 
-    print(stud_info)
+        quiz_info = zip(quiz_list,student_quiz_info)      
+    else :
+        quiz_list = list(Quiz.objects.filter(classes=class_obj))            
+
     participant_list = class_obj.user.all()
     teacher_list = []
     student_list = []
-    for each_user in participant_list:
-        if each_user.is_superuser:
+    for each_user in participant_list :        
+        if each_user.is_superuser :
             pass
 
-        elif str(each_user.job.status) == 'student':
-            student_list.append(each_user)
+        elif str(each_user.job.status)== 'student' :
+            student_list.append(each_user)              
 
-        elif str(each_user.job.status) == 'teacher':
+        elif str(each_user.job.status)== 'teacher' :
             teacher_list.append(each_user)
 
     user_list = []
     if Comments.objects.filter(clas_id=class_pk).exists():
-        comments = get_list_or_404(Comments, clas_id=class_pk)
-        for comment in comments:
-            user_list.append(get_object_or_404(User, pk=comment.user_id))
-
-    else:
+        comments = get_list_or_404(Comments,clas_id=class_pk)
+        for comment in comments :            
+            user_list.append(get_object_or_404(User,pk=comment.user_id))
+        
+    else :
         comments = []
 
-    user_comments_list = zip(user_list, comments)
+    user_comments_list = zip(user_list,comments)
     context = {
-        'student_quiz_info': student_quiz_info,
-        'stud_info': stud_info,
-        'class_obj': class_obj,
-        'student_list': student_list,
-        'teacher_list': teacher_list,
-        'quiz_list': quiz_list,
-        'comments_form': CommentsForm(),
-        'user_comments_list': user_comments_list,
+        'quiz_info':quiz_info,
+        'class_obj':class_obj,
+        'student_list':student_list,
+        'teacher_list':teacher_list,
+        'quiz_list':quiz_list,
+        'comments_form':CommentsForm(),   
+        'user_comments_list':user_comments_list,       
     }
-    return render(request, 'quiz/class_view.html', context)
+    return render(request,'quiz/class_view.html',context)
 
 
 @login_required
@@ -279,12 +280,12 @@ def scoreSave(student_quiz_info):
 
 @login_required
 def getQuizResult(request, quiz_id):
-    student_quiz_info = list(StudentQuizInfo.objects.filter(
-        quiz_id=quiz_id).filter(user_id=request.user.id))[0]
-    quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
-    context = {'student_quiz_info': student_quiz_info, 'quiz_obj': quiz_obj}
-    return render(request, 'quiz/quizResult.html', context)
-
+    student_quiz_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))[0]
+    student_quiz_info.completed = True
+    student_quiz_info.save()
+    quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+    context = {'student_quiz_info':student_quiz_info,'quiz_obj':quiz_obj}
+    return render(request, 'quiz/quizResult.html',context)
 
 @login_required
 def questionFormSubmit(request, quiz_id):
@@ -313,10 +314,9 @@ def checkAnswer(request, question_id):
         question_obj = get_object_or_404(Question, pk=question_id)
         quiz = get_object_or_404(Quiz, pk=question_obj.quiz_id)
         print(quiz.title)
-        question_obj_list = list(StudentQuizInfo.objects.filter(
-            quiz_id=question_obj.quiz_id).filter(user_id=request.user.id))
-
-        if len(question_obj_list) != 0:
+        question_obj_list = list(StudentQuizInfo.objects.filter(quiz_id=question_obj.quiz_id).filter(user_id=request.user.id))
+        print(question_obj_list[0].id)
+        if len(question_obj_list) != 0 :
             question_obj_list[0].quiz_questions.remove(question_obj)
             print(question_obj_list[0].quiz_questions.all())
             if question_obj_list[0].quiz_questions.exists():
@@ -410,6 +410,25 @@ def postComment(request, class_id):
 
     return redirect('quiz:classView', class_pk=class_id)
 
+
+@login_required
+def deleteComment(request, comment_id):
+    comment_obj = get_object_or_404(Comments,pk=comment_id)
+    class_obj = get_object_or_404(Class,pk=comment_obj.clas_id)
+    comment_obj.delete()
+    return redirect('quiz:classView',class_pk=class_obj.id)
+
+@login_required
+def quizAnswer(request,stud_quiz_info_id,quiz_id):
+    quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
+    if quiz_obj.answer_available == True :
+        stud_quiz_info_obj = get_object_or_404(StudentQuizInfo,pk=stud_quiz_info_id)
+        quesion_list = get_list_or_404(Question,quiz_id=quiz_id)
+        context = {'quiz_obj':quiz_obj,'stud_quiz_info_obj':stud_quiz_info_obj,'quesion_list':quesion_list}
+        return render(request, 'quiz/quizAnswer.html',context)        
+
+    else :
+        return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_id)
 
 @login_required
 def deleteComment(request, comment_id):

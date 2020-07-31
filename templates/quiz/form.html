@@ -63,7 +63,6 @@
             </div>
         </div>
         <br>
-        {% include './StudentQuizResult.html' %}
         <!-- <a class="btn btn-success" href="{% url 'quiz:studentQuizResult' quiz_obj.id %}">Student score</a> -->
         {% if quiz_obj.make_visible == False %}
         <h2>Add Question</h2>
@@ -76,6 +75,8 @@
             {{ options_form|crispy }}
             <button class="btn btn-primary" type="submit">Submit</button>
         </form>
+        {% else %}
+            {% include './StudentQuizResult.html' %}    
         {% endif %}
         {% else %}
         <div id="replaceable-content">
@@ -89,39 +90,70 @@
 <script src="//code.jquery.com/jquery-3.5.0.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        const questions_div = $('#replaceable-content')
-        let endpointNextQuestion = '/quiz/check_answer/{{question_obj.id}}'
+    const questions_div = $('#replaceable-content')
+    let endpointNextQuestion = '/quiz/check_answer/{{question_obj.id}}'
 
-        let ajax_check = function () {
-            let checked_array = '';
-            $("input:checkbox[name=optionList]:checked").each(function () {
-                checked_array = checked_array + $(this).val() + ',';
-            });
-            let inpuText = $('#answer').val()
-            jQuery.ajax({
-                type: 'GET',
-                url: endpointNextQuestion,
-                data: { 'checked_array': checked_array, 'inputText': inpuText },
-                success: function (response) {
-                    let quiz_id = response['quiz_id']
-                    if (quiz_id != null) {
-                        window.location.reload();
-                    }
-                    questions_div.html(response['html_from_view']);
-                    alert(response['result']);
-                    endpointNextQuestion = '/quiz/check_answer/' + String(response['id'])
-                    {% if quiz_obj.timer %}
-                    setTimeout(ajax_check, timeInMilli);
-                    {% endif %}
-                },
-                error: function (response) {
-                    alert("Ajax Error");
+    function ajax() { 
+        alert(endpointNextQuestion)
+        let checked_array = '';
+        $("input:checkbox[name=optionList]:checked").each(function () {
+            checked_array = checked_array + $(this).val() + ',';
+        });
+        let inpuText = $('#answer').val()
+        jQuery.ajax({
+            type: 'GET',
+            url: endpointNextQuestion,
+            data: { 'checked_array': checked_array, 'inputText': inpuText },
+            success: function (response) {
+                let quiz_id = response['quiz_id']
+                if (quiz_id != null) {
+                    window.location.reload();
                 }
-            });
-        };
-        {% if quiz_obj.timer %}
-        timeInsec = '{{quiz_obj.timer}}';
+                questions_div.html(response['html_from_view']);
+                alert(response['result']);
+                endpointNextQuestion = '/quiz/check_answer/' + String(response['id'])
+            },
+            error: function (response) {
+                alert("Ajax Error");
+            }
+        });
+    };
+
+
+
+  $(document).ready(function(){    
+
+    let ajax_check = function() {
+        let checked_array = '';
+        $("input:checkbox[name=optionList]:checked").each(function () {
+            checked_array = checked_array + $(this).val() + ',';
+        });
+        let inpuText = $('#answer').val()
+        jQuery.ajax({
+            type: 'GET',
+            url: endpointNextQuestion,
+            data: { 'checked_array': checked_array, 'inputText': inpuText },
+            success: function (response) {
+                let quiz_id = response['quiz_id']
+                if (quiz_id != null) {
+                    window.location.reload();
+                }
+                questions_div.html(response['html_from_view']);
+                alert(response['result']);
+                endpointNextQuestion = '/quiz/check_answer/' + String(response['id'])
+                {% if quiz_obj.timer %}
+                    setTimeout(ajax_check,timeInMilli);
+                {% endif %}
+            },
+            error: function (response) {
+                alert("Ajax Error");
+            }
+        });
+    };
+
+
+    {% if quiz_obj.timer %}
+        timeInsec =  '{{quiz_obj.timer}}';
         timeInMilli = parseInt(timeInsec) * 1000;
         setTimeout(ajax_check, timeInMilli);
         {% endif %}
