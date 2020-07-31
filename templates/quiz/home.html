@@ -4,7 +4,7 @@
 
 <div class="container ">
     <div class="row py-5">
-        {% for class,faculty_count,student_count,quiz_count in class_list %}
+        {% for class,faculty_count,student_count,quiz_count,poll_count in class_list %}
         <div class="col-md-4">
             <div class="card">
                 <h3 class="card-header">{{class.class_name}}</h3>
@@ -17,6 +17,9 @@
                     </div>
                     <div>
                         <strong>Quiz Count: </strong>{{quiz_count}}
+                    </div>
+                    <div>
+                        <strong>Poll Count: </strong>{{poll_count}}
                     </div>
                 </div>
                 <div class="card-footer">

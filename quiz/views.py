@@ -7,8 +7,8 @@ from django.template.loader import render_to_string
 import os
 
 import Quiz_system.settings as settings
-from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class, Comments
-from .forms import QuizForm, QuestionForm, OptionsForm, CommentsForm
+from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class, Comments, Poll, PollChoices
+from .forms import QuizForm, QuestionForm, OptionsForm, CommentsForm, PollForm, PollChoicesForm
 
 
 @login_required
@@ -23,6 +23,7 @@ def home(request):
     class_list = list(Class.objects.filter(user=request.user))
     faculty_count = []
     student_count = []
+    poll_count = []
     quiz_count = []
     for each in class_list:
         temp_teach = []
@@ -39,8 +40,9 @@ def home(request):
         temp_stud.clear()
         quiz_count.append(Quiz.objects.filter(
             make_visible=True).filter(classes=each).count())
+        poll_count.append(Poll.objects.filter(activate=True).filter(classes=each).count())
 
-    class_info = zip(class_list, faculty_count, student_count, quiz_count)
+    class_info = zip(class_list, faculty_count, student_count, quiz_count, poll_count)
     context = {
         'class_list': class_info
     }
@@ -51,8 +53,10 @@ def home(request):
 def classView(request,class_pk):
     stud_info = []
     quiz_info = []
+    poll_list = []
     class_obj = get_object_or_404(Class,pk=class_pk)
     if str(request.user.job.status) == 'student':
+        poll_list = list(Poll.objects.filter(activate=True).filter(classes=class_obj))
         quiz_list = list(Quiz.objects.filter(make_visible=True).filter(classes=class_obj))            
         student_quiz_info = []
         if len(quiz_list) != 0:
@@ -65,7 +69,8 @@ def classView(request,class_pk):
 
         quiz_info = zip(quiz_list,student_quiz_info)      
     else :
-        quiz_list = list(Quiz.objects.filter(classes=class_obj))            
+        quiz_list = list(Quiz.objects.filter(classes=class_obj))     
+        poll_list = list(Poll.objects.filter(classes=class_obj))
 
     participant_list = class_obj.user.all()
     teacher_list = []
@@ -92,6 +97,7 @@ def classView(request,class_pk):
     user_comments_list = zip(user_list,comments)
     context = {
         'quiz_info':quiz_info,
+        'poll_list':poll_list,
         'class_obj':class_obj,
         'student_list':student_list,
         'teacher_list':teacher_list,
@@ -385,14 +391,16 @@ def deleteQuestion(request, question_id):
 def deleteQuiz(request, quiz_id):
     quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
     question_list = get_list_or_404(Question, quiz_id=quiz_id)
+    question_list = list(Question.objects.filter(quiz_id=quiz_id))
     if quiz_obj.make_visible == False and str(request.user.job.status) == 'teacher':
-        for question in question_list:
-            Options.objects.filter(question_id=question.id).delete()
-            if question.figure is not None:
-                os.remove(os.path.join(settings.MEDIA_ROOT,
-                                       str(question.figure.name)))
+        if len(question_list) != 0 :
+            for question in question_list:            
+                Options.objects.filter(question_id=question.id).delete()
+                if question.figure is not None:
+                    os.remove(os.path.join(settings.MEDIA_ROOT,
+                                        str(question.figure.name)))
 
-            question.delete()
+                question.delete()
         quiz_obj.delete()
 
     return redirect('/quiz/')
@@ -419,26 +427,6 @@ def deleteComment(request, comment_id):
     return redirect('quiz:classView',class_pk=class_obj.id)
 
 @login_required
-def quizAnswer(request,stud_quiz_info_id,quiz_id):
-    quiz_obj = get_object_or_404(Quiz,pk=quiz_id)
-    if quiz_obj.answer_available == True :
-        stud_quiz_info_obj = get_object_or_404(StudentQuizInfo,pk=stud_quiz_info_id)
-        quesion_list = get_list_or_404(Question,quiz_id=quiz_id)
-        context = {'quiz_obj':quiz_obj,'stud_quiz_info_obj':stud_quiz_info_obj,'quesion_list':quesion_list}
-        return render(request, 'quiz/quizAnswer.html',context)        
-
-    else :
-        return redirect('quiz:quizInfoTeacherView',quiz_id=quiz_id)
-
-@login_required
-def deleteComment(request, comment_id):
-    comment_obj = get_object_or_404(Comments, pk=comment_id)
-    class_obj = get_object_or_404(Class, pk=comment_obj.clas_id)
-    comment_obj.delete()
-    return redirect('quiz:classView', class_pk=class_obj.id)
-
-
-@login_required
 def quizAnswer(request, stud_quiz_info_id, quiz_id):
     quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
     if quiz_obj.answer_available == True:
@@ -451,3 +439,99 @@ def quizAnswer(request, stud_quiz_info_id, quiz_id):
 
     else:
         return redirect('quiz:quizInfoTeacherView', quiz_id=quiz_id)
+
+@login_required
+def createPoll(request):
+    if request.method == "POST":
+        form = PollForm(request.POST)
+        classList = request.POST.getlist('classList')
+        if form.is_valid():
+            form_obj = form.save()    
+            for each_class in classList:
+                form_obj.classes.add(Class.objects.get(pk=int(each_class)))
+            form_obj.save()
+            return redirect('quiz:createPollChoices',poll_id=form_obj.id) 
+
+    class_list = get_list_or_404(Class, user=request.user)
+    context = {
+        'poll_form':PollForm,
+        'class_list':class_list,
+        'type':'poll_form',
+    }
+    return render(request,'quiz/poll.html',context)
+
+@login_required
+def createPollChoices(request, poll_id):
+    if request.method == 'POST':
+        form = PollChoicesForm(request.POST)
+        if form.is_valid() :
+            form_obj = form.save(commit=False)
+            form_obj.poll_id = poll_id
+            form_obj.save()
+
+
+    form = PollChoicesForm()
+    poll_obj = get_object_or_404(Poll,pk=poll_id)
+    poll_choices = list(PollChoices.objects.filter(poll_id=poll_id))
+    context = {'type':'poll_view',
+        'poll_choice_form':form,
+        'poll_obj':poll_obj,
+        'poll_choices':poll_choices,
+    }
+    return render(request,'quiz/poll.html',context)
+
+@login_required
+def deletePollChoice(request,poll_choice_id):
+    poll_choice_obj = get_object_or_404(PollChoices,pk=poll_choice_id)
+    poll_obj = get_object_or_404(Poll,pk=poll_choice_obj.poll_id)
+    if request.user.job.status == 'teacher' and poll_obj.activate == False:
+        poll_choice_obj.delete()
+    
+    return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
+
+@login_required
+def deletePoll(request,poll_id):
+    poll_obj = get_object_or_404(Poll,pk=poll_id)
+    if request.user.job.status == 'teacher' and poll_obj.activate == False:
+        poll_choices = list(PollChoices.objects.filter(poll_id=poll_id))
+        if len(poll_choices) != 0 :
+            for choice in poll_choices :
+                choice.delete()
+
+        poll_obj.delete()
+    return redirect('/quiz/')    
+
+@login_required
+def activatePoll(request, poll_id):
+    poll_obj = get_object_or_404(Poll,pk=poll_id)
+    poll_obj.activate = True
+    poll_obj.save()
+    return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
+
+@login_required
+def deactivatePoll(request, poll_id):
+    poll_obj = get_object_or_404(Poll,pk=poll_id)
+    poll_obj.activate = False
+    poll_obj.save()
+    return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -48,9 +48,23 @@ class StudentQuizInfo(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
 
 class Comments(models.Model):
-    comment = models.TextField()
+    comment = models.TextField(blank=False,null=False)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     spam = models.BooleanField(null=True,blank=True,primary_key=False)
     clas = models.ForeignKey(Class,on_delete=models.CASCADE)
+
+
+class Poll(models.Model):
+    title = models.CharField(max_length=250)
+    description = models.TextField(null=True,blank=True)
+    classes = models.ManyToManyField(Class)
+    activate = models.BooleanField(default=False,primary_key=False)
+
+class PollChoices(models.Model):
+    choice = models.TextField(blank=False,null=False)
+    poll = models.ForeignKey(Poll,on_delete=models.CASCADE)
+    user = models.ManyToManyField(User)
+
+
 
 

@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Quiz, Question, Options, Comments
+from .models import Quiz, Question, Options, Comments, Poll, PollChoices
 
 class QuizForm(forms.ModelForm):
     class Meta:
@@ -55,8 +55,31 @@ class CommentsForm(forms.ModelForm) :
         super(CommentsForm, self).__init__(*args, **kwargs)
         self.fields['comment'].required=True 
 
+class PollForm(forms.ModelForm):
 
 
+    class Meta :
+        model = Poll
+        fields = ('title','description')
+
+    def __init__(self, *args, **kwargs):
+        super(PollForm, self).__init__(*args, **kwargs)
+        self.fields['title'].required=True 
+        self.fields['description'].required=False
+
+class PollChoicesForm(forms.ModelForm):
+
+    class Meta :
+        model = PollChoices
+        fields = ('choice',)
+        widgets = {
+            'choice': forms.TextInput(attrs={'placeholder':'Enter choice'}),
+        }   
+
+    def __init__(self, *args, **kwargs):
+        super(PollChoicesForm, self).__init__(*args, **kwargs)
+        self.fields['choice'].required=True 
+        self.fields['choice'].label = False        
 
 
 

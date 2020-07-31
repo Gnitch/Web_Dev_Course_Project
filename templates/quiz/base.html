@@ -40,14 +40,23 @@
           </a>
         </li>
         {% if request.user.job.status == 'teacher' %}
-        <li class="nav-item active">
-          <a class="nav-link" href="{% url 'quiz:addQuiz' %}">
-            <span class="nav_link">
-              Add Quiz
-            </span>
-            <span class="sr-only">(current)</span>
-          </a>
-        </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'quiz:addQuiz' %}">
+              <span class="nav_link">
+                Add Quiz
+              </span>
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'quiz:createPoll' %}">
+              <span class="nav_link">
+                Add Poll
+              </span>
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
         {% endif %}
 
         <li class="nav-item active">

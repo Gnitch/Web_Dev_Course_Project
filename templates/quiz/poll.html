@@ -1,0 +1,78 @@
+{% extends "./base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+{% load static %}
+    <link rel="stylesheet" href="{% static 'quiz/poll.css' %}">
+    <div class="container">
+        {% if request.user.job.status == 'teacher' %}
+            <div class="col"> 
+                {% if type == 'poll_form' %}
+                    <h1 class="d-inline">Create Poll</h1>                
+                    <form action="{% url 'quiz:createPoll' %}" method="POST">
+                        {% csrf_token %}
+                        {{ poll_form|crispy }}
+                        {% for class in class_list %}
+                            <input type="checkbox" name="classList" value="{{class.id}}">
+                            <label for="{{class.class_name}}">{{class.class_name}}</label>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary w-100">Submit</button>
+                    </form>
+                {% elif type == 'poll_view' %}
+                    <h1 class="text-center">Poll</h1>                
+                    <h1 class="d-inline">{{poll_obj.title}}</h1>
+                    <h4 class="text-secondary">{{poll_obj.description}}</h3>
+                    {% if poll_obj.activate == False %}
+                        <a href="{% url 'quiz:deletePoll' poll_obj.id %}"><button class="btn btn-danger mb-3">Delete poll</button></a>
+                    {% endif %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    {% if poll_obj.activate == False %}                                                
+                                        <th scope="col">#</th>
+                                    {% endif %}
+                                    <th scope="col">Choices</th>
+                                    <th scope="col">Users count</th>
+                                    <th scope="col">Percentile</th>
+                                </tr>
+                                </thead>
+                                <tbody>                                    
+                                    {% if poll_choices %}
+                                        {% for choice in poll_choices %}    
+                                            <tr>
+                                            {% if poll_obj.activate == False %}                                                
+                                                <th scope="row">
+                                                    <a class="text-danger " href="{% url 'quiz:deletePollChoice' choice.id %}">
+                                                        <i class="fa fa-trash"></i></a>
+                                                </th>
+                                            {% endif %}
+                                            <td>{{choice.choice}}</td>            
+                                            <td>{{choice.user.count}}</td>
+                                            <td>Otto</td>
+                                            </tr>
+                                        {% endfor %}                           
+                                    {% endif %}                                      
+                                </tbody>
+                        </table>
+                        </div>
+                        {% if poll_obj.activate == False %}
+                            <span class="text-danger">You cannot edit poll once it is live. </span>
+                            <a href="{% url 'quiz:activatePoll' poll_obj.id %}"><button class="btn btn-warning">Activate poll</button></a>
+                        {% else %}
+                            <a href="{% url 'quiz:deactivatePoll' poll_obj.id %}"><button class="btn btn-success">Deactivate poll</button></a>
+                        {% endif %}
+                        <form action="{% url 'quiz:createPollChoices' poll_obj.id %}" method="POST">
+                            {% csrf_token %}
+                            {{ poll_choice_form|crispy }}
+                            <button type="submit" class="mb-2 btn btn-primary">Submit</button>
+                        </form>                                    
+                {% endif %}
+            </div>
+        {% else %}
+
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+

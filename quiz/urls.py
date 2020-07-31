@@ -19,6 +19,12 @@ urlpatterns = [
     path('post_comment/<int:class_id>',views.postComment,name='postComment'),
     path('delete_comment/<int:comment_id>',views.deleteComment,name='deleteComment'),
     path('quiz_answer/<int:stud_quiz_info_id>/<int:quiz_id>',views.quizAnswer,name='quizAnswer'),    
+    path('add_poll/',views.createPoll,name='createPoll'),
+    path('add_poll_choices/<int:poll_id>/',views.createPollChoices,name='createPollChoices'),
+    path('delete_poll/<int:poll_id>/',views.deletePoll,name='deletePoll'),
+    path('activate_poll/<int:poll_id>/',views.activatePoll,name='activatePoll'),
+    path('deactivate_poll/<int:poll_id>/',views.deactivatePoll,name='deactivatePoll'),
+    path('delete_poll_choices/<int:poll_choice_id>/',views.deletePollChoice,name='deletePollChoice'),
     path('logout/',views.logout,name='logout'),
 ]
 
