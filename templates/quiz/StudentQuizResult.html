@@ -1,24 +1,24 @@
-<!DOCTYPE html>
-{% include 'quiz/base.html' %}
-<html lang="en">
+{% block content  %}
+<h3>Results</h3>
+<ul class="list-group">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Student name</th>
+                <th scope="col">Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user, student in student_list %}
+            <tr>
+                <th scope="row">1</th>
+                <td>{{user.username}}</td>
+                <td><span class="text-success">{{student.score}}</span>/{{quiz_obj.total_questions}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</ul>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
-    <h1>{{quiz_obj.title}}</h1>
-    <h2>{{quiz_obj.description}}</h2>
-    <ul>
-        {% for user, student in student_list %}
-        <li>
-            {{user.username}},
-            {{student.score}}/{{quiz_obj.total_questions}}
-        </li>
-        {% endfor %}
-    </ul>
-</body>
-
-</html>
+{% endblock %}

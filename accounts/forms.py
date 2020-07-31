@@ -7,7 +7,10 @@ class UserAuthenticationForm(AuthenticationForm):
 
     class Meta :
         model = User
-        fields = ('username','password')       
+        fields = ('username','password')     
+        widgets = {
+            'options': forms.TextInput(attrs={'name':'options'}),
+        }    
     def __init__(self, *args, **kwargs):
         super(UserAuthenticationForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget = forms.TextInput(attrs={'class': 'form-custom', 'placeholder': 'Enter Username'}) 
