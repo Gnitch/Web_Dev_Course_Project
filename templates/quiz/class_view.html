@@ -1,7 +1,8 @@
 {% extends "./base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
-
+<link rel="stylesheet" href="{% static 'quiz/class_view.css' %}">
 <div class="container">
     <div class="jumbotron my-3">
         <h1>
@@ -19,36 +20,59 @@
         <div class="col-md-8">
             <h5>Quiz</h5>
             <ul class="list-group">
-                {% for quiz in quiz_list %}
-                <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
-                    <li class="list-group-item">{{quiz.title}}</li>
-                </a>
-                {% endfor %}
+                {% if request.user.job.status == 'student' %}
+                    {% for quiz, info in quiz_info %}
+                    <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
+                        <li class="list-group-item">{{quiz.title}}</li>
+                        {% if info.completed == True %}
+                            <h3>completed</h3>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    {% for quiz in quiz_list %}
+                    <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
+                        <li class="list-group-item">{{quiz.title}}</li>
+                        {% if quiz.make_visible == True %}
+                            <h3>visible</h3>
+                        {% endif %}
+                    </a>
+                    {% endfor %}                                     
+                {% endif %}
             </ul>
         </div>
         <div class="col-md-4">
-            <h5>Students </h2>
+            <h5>Students </h5>
                 <ul class="list-group">
                     {% for each_student in student_list %}
                     <li class="list-group-item">{{each_student}}</li>
                     {% endfor %}
                 </ul>
         </div>
+
     </div>
     <div class="row">
-        // Comment box //
-        <br>
-        <!-- {% for user, comment in user_comments_list %}
-            {{user}},{{comment}}
-        {% endfor %} -->
+        
+        <div class="col-md-8 mb-2 mt-2">
+            <h5>Comments</h5>
+            <div class="comments-box">
+                {% for user, comment in user_comments_list %}                    
+                    <p class="username">> <Strong>{{user.username}}</Strong> 
+                        {% if request.user == user %}
+                            <a href="{% url 'quiz:deleteComment' comment.id %}"> <i class="fa fa-trash text-danger"></i> </a>                            
+                        {% endif %}
+                    </p>
+                    <p class="comment">{{comment.comment}}</p>
+                {% endfor %}
+            </div>
 
-        <form action="{% url 'quiz:postComment' class_obj.id %}" method="POST">
-            {% csrf_token %}
-            {{comments_form|crispy}}
-            <button class="btn btn-dark" type="submit">Submit</button>
-        </form>
+            <form action="{% url 'quiz:postComment' class_obj.id %}" method="POST">
+                {% csrf_token %}
+                {{comments_form|crispy}}
+                <button class="btn btn-dark w-100" type="submit">Post</button>
+            </form>            
+        </div>
     </div>
-
 </div>
 
 {% endblock %}
