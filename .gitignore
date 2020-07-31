@@ -5,3 +5,4 @@ accounts/__pycache__/
 accounts/migrations/__pycache__/
 quiz/migrations/__pycache__/
 .vscode/settings.json
+db.sqlite3
