@@ -1,52 +1,41 @@
-<!DOCTYPE html>
-{% load static %}
-{% load crispy_forms_tags %}
-<html>
-	<head>
-		<title>Final Project</title>
-		<link rel="stylesheet" type="text/css" href="{% static 'accounts/style.css' %}">
-		<link rel="shortcut icon" type="image/jpg" href="media/favicon.png">
-		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-	</head>
-	<body>
-		<main>
-			{% if user.is_authenticated %}
-				<meta http-equiv="refresh" content=" 0; url = {% url 'quiz:home' %} " />
-			{% endif %}
-			<div class="container">
-					<div class="login-part right">
-						<h1 class="title">Quiz</h1>
-						<h3 class="welcome">Sign In</h3>
-						<form method="post">
-							{% csrf_token %} 
-							{{ form|crispy }} 
-							{% if type_form == 'login' %}
-					
-							<div>
-							  <a href="{% url 'accounts:pass_reset' %}">
-								<p>Reset Password</p>
-							  </a>
-							</div>
-							<div>
-							  <p>{{message}}</p>
-							  <button class="mx-auto btn btn-primary d-block" type="submit">Login</button>
-							</div>
-					
-							{% else %}
-					
-							<p>{{message}}</p>
-							<div>
-							  <button class="btn btn-primary mx-auto d-block" type="submit">Register</button>
-							</div>
-							{% endif %}
-						  </form>
-                        <div>
-                            <h5>or</h5>
-                        </div>
-					</div>
-			</div>
-		</main>
-	</body>
-</html>
+{% extends "../quiz/base.html" %}{% block content %}
+<body>
+  {% load crispy_forms_tags %}
+  <main>
+    {% if user.is_authenticated %}
+    <meta http-equiv="refresh" content=" 0; url = {% url 'quiz:home' %} " />
+    {% endif %}
+    <div class="container">
+      <div class="login-part right">
+        <h1 class="title">Quiz</h1>
+        <h3 class="welcome">Sign In</h3>
+        <form method="post">
+          {% csrf_token %} {{ form|crispy }} {% if type_form == 'login' %}
+
+          <div>
+            <a href="{% url 'accounts:pass_reset' %}">
+              <p>Reset Password</p>
+            </a>
+          </div>
+          <div>
+            <p>{{message}}</p>
+            <button class="mx-auto btn btn-primary d-block" type="submit">
+              Login
+            </button>
+          </div>
+
+          {% else %}
+
+          <p>{{message}}</p>
+          <div>
+            <button class="btn btn-primary mx-auto d-block" type="submit">
+              Register
+            </button>
+          </div>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </main>
+</body>
+{% endblock %}
