@@ -445,12 +445,13 @@ def createPoll(request):
     if request.method == "POST":
         form = PollForm(request.POST)
         classList = request.POST.getlist('classList')
-        if form.is_valid():
-            form_obj = form.save()    
-            for each_class in classList:
-                form_obj.classes.add(Class.objects.get(pk=int(each_class)))
-            form_obj.save()
-            return redirect('quiz:createPollChoices',poll_id=form_obj.id) 
+        if request.user.job.status == 'teacher' :
+            if form.is_valid():
+                form_obj = form.save()    
+                for each_class in classList:
+                    form_obj.classes.add(Class.objects.get(pk=int(each_class)))
+                form_obj.save()
+                return redirect('quiz:createPollChoices',poll_id=form_obj.id) 
 
     class_list = get_list_or_404(Class, user=request.user)
     context = {
@@ -464,21 +465,59 @@ def createPoll(request):
 def createPollChoices(request, poll_id):
     if request.method == 'POST':
         form = PollChoicesForm(request.POST)
-        if form.is_valid() :
-            form_obj = form.save(commit=False)
-            form_obj.poll_id = poll_id
-            form_obj.save()
+        if request.user.job.status == 'teacher' :
+            if form.is_valid() :
+                form_obj = form.save(commit=False)
+                form_obj.poll_id = poll_id
+                form_obj.save()
 
 
-    form = PollChoicesForm()
+    form = PollChoicesForm()    
     poll_obj = get_object_or_404(Poll,pk=poll_id)
     poll_choices = list(PollChoices.objects.filter(poll_id=poll_id))
+    context = {'poll_info':None,'poll_percent':None}
+    if len(poll_choices) != 0:
+        context = getPollResult(poll_id)
+        
     context = {'type':'poll_view',
         'poll_choice_form':form,
         'poll_obj':poll_obj,
-        'poll_choices':poll_choices,
+        'poll_info':context['poll_info'],
+        'poll_percent':context['poll_percent'],
     }
+    if request.user.job.status == 'student' :
+        if len(poll_choices) != 0 :
+            for choice in poll_choices :
+                if request.user in choice.user.all():
+                    context['type'] = 'result'
+
     return render(request,'quiz/poll.html',context)
+
+def getPollResult(poll_id):
+    poll_obj = get_object_or_404(Poll,pk=poll_id)
+    poll_choices = get_list_or_404(PollChoices,poll_id=poll_id)
+    poll_choices_count = []
+    for choice in poll_choices :
+        poll_choices_count.append(int(choice.user.count()))
+
+    total = 0
+    for choice_count in poll_choices_count :
+        total += choice_count
+
+    poll_percent = []
+    for count in poll_choices_count :
+        if total != 0 and count != 0:
+            poll_percent.append( round((count * 100)/total) )
+        else :
+            poll_percent.append(0)
+
+    poll_info = zip(poll_choices,poll_percent)
+    context = {
+        'poll_obj':poll_obj,
+        'poll_info':poll_info,
+        'poll_percent':poll_percent,             
+    }
+    return context
 
 @login_required
 def deletePollChoice(request,poll_choice_id):
@@ -504,8 +543,10 @@ def deletePoll(request,poll_id):
 @login_required
 def activatePoll(request, poll_id):
     poll_obj = get_object_or_404(Poll,pk=poll_id)
-    poll_obj.activate = True
-    poll_obj.save()
+    poll_choices = list(PollChoices.objects.filter(poll_id=poll_id))
+    if len(poll_choices) > 0:
+        poll_obj.activate = True
+        poll_obj.save()
     return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
 
 @login_required
@@ -515,20 +556,27 @@ def deactivatePoll(request, poll_id):
     poll_obj.save()
     return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
 
+@login_required
+def userSubmitPollChoice(request):
+    poll_choice_id = int(request.POST.get('choiceList'))
+    poll_choice_obj = get_object_or_404(PollChoices,pk=poll_choice_id)
+    poll_obj = get_object_or_404(Poll,pk=poll_choice_obj.poll_id)
+    poll_choices = get_list_or_404(PollChoices,poll_id=poll_obj.id)
+    if request.method == 'POST':    
+        for choice in poll_choices :
+            if request.user in choice.user.all():
+                choice.user.remove(request.user)
+                
+        poll_choice_obj.user.add(request.user)
+        poll_choice_obj.save()
 
+    return redirect('quiz:userResultPoll',poll_id=poll_obj.id) 
 
-
-
-
-
-
-
-
-
-
-
-
-
+@login_required
+def userResultPoll(request,poll_id):
+    context = getPollResult(poll_id)
+    context['type'] = 'result'
+    return render(request,'quiz/poll.html',context)
 
 
 

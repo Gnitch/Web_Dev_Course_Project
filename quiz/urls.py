@@ -24,7 +24,9 @@ urlpatterns = [
     path('delete_poll/<int:poll_id>/',views.deletePoll,name='deletePoll'),
     path('activate_poll/<int:poll_id>/',views.activatePoll,name='activatePoll'),
     path('deactivate_poll/<int:poll_id>/',views.deactivatePoll,name='deactivatePoll'),
+    path('poll_result/<int:poll_id>/',views.userResultPoll,name='userResultPoll'),
     path('delete_poll_choices/<int:poll_choice_id>/',views.deletePollChoice,name='deletePollChoice'),
+    path('user_submit_poll_choices/',views.userSubmitPollChoice,name='userSubmitPollChoice'),
     path('logout/',views.logout,name='logout'),
 ]
 

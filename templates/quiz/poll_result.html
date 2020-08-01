@@ -1,0 +1,39 @@
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                {% if poll_obj.activate == False %}                                                
+                    <th scope="col">#</th>
+                {% endif %}
+                <th scope="col">Choice</th>
+                <th scope="col">Users count</th>
+                <th scope="col">Votes</th>
+            </tr>
+            </thead>
+            <tbody>                                    
+                {% if poll_info %}
+                    {% for choice, percent in poll_info %}    
+                        <tr>
+                        {% if poll_obj.activate == False %}                                                
+                            <th scope="row">
+                                {% if request.user.job.status == 'teacher' %}
+                                    <a class="text-danger " href="{% url 'quiz:deletePollChoice' choice.id %}">
+                                    <i class="fa fa-trash"></i></a>
+                                {% endif %}
+                            </th>
+                        {% endif %}
+                        <td>{{choice.choice}}</td>            
+                        <td>{{choice.user.count}}</td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar text-light progress-bar-striped progress-bar-animated bg-secondary" 
+                                role="progressbar" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100"
+                                 style="width: {{percent}}%">{{percent}} %</div>
+                              </div>                                 
+                        </td>
+                        </tr>
+                    {% endfor %}                           
+                {% endif %}                                      
+            </tbody>
+    </table>
+</div>
