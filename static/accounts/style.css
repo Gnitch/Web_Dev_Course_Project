@@ -45,6 +45,15 @@ main .row {
   height: 60px;
 }
 
+.register-title {
+  font-family: "valorant";
+  font-size: 2rem;
+  text-align: center;
+  color: #201b17;
+  display: block;
+  height: 60px;
+}
+
 .welcome {
   color: #000000;
   text-align: center;

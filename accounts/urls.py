@@ -7,6 +7,7 @@ from . import views
 app_name='accounts'
 urlpatterns = [
     path('',views.userLogin,name='user_login'),
+    path('user_register',views.userRegister,name='userRegister'),
     path('password-reset/',auth_views.PasswordResetView.as_view(template_name='accounts/pass_reset.html'),name='pass_reset'),
     path('password-reset/done/',auth_views.PasswordResetDoneView.as_view(template_name='accounts/pass_reset_done.html'),name='password_reset_done'),
     path('password-reset-confirm/<uidb64>/<token>/',auth_views.PasswordResetDoneView.as_view(template_name='accounts/pass_reset_confirm.html'),name='password_reset_confirm'),

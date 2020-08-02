@@ -34,7 +34,7 @@
     <a class="navbar-brand" href="{% url 'quiz:home' %}">
       <span class="nav_link" id="home">
         Home        
-        <img src="{% static 'quiz/Braniac3.png' %}" alt="logo">       
+        <!-- <img src="{% static 'quiz/Braniac3.png' %}" alt="logo">        -->
       </span>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -73,6 +73,26 @@
             <a class="nav-link" href="{% url 'quiz:createPoll' %}">
               <span class="nav_link">
                 Add Poll
+              </span>
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% if request.user.is_superuser  %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'accounts:userRegister' %}">
+              <span class="nav_link">
+                Add User
+              </span>
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'quiz:createPoll' %}">
+              <span class="nav_link">
+                Add Class
               </span>
               <span class="sr-only">(current)</span>
             </a>

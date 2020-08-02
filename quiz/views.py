@@ -564,16 +564,18 @@ def deletePoll(request,poll_id):
 def activatePoll(request, poll_id):
     poll_obj = get_object_or_404(Poll,pk=poll_id)
     poll_choices = list(PollChoices.objects.filter(poll_id=poll_id))
-    if len(poll_choices) > 0:
-        poll_obj.activate = True
-        poll_obj.save()
+    if request.user.job.status == 'teacher' and poll_obj.activate == False:
+        if len(poll_choices) > 0:
+            poll_obj.activate = True
+            poll_obj.save()
     return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
 
 @login_required
 def deactivatePoll(request, poll_id):
     poll_obj = get_object_or_404(Poll,pk=poll_id)
-    poll_obj.activate = False
-    poll_obj.save()
+    if request.user.job.status == 'teacher' and poll_obj.activate == True:
+        poll_obj.activate = False
+        poll_obj.save()        
     return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
 
 @login_required
