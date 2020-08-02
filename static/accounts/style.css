@@ -18,46 +18,22 @@ main {
   background-size: cover;
 }
 
-.container {
-  width: 80%;
-  height: 80%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
+main .container {
+  padding: 10px;
+  height: 85%;
 }
 
-.login-part {
-  width: 40%;
+main .row {
   height: 100%;
 }
 
-@media only screen and (max-width: 568px) {
-  .container {
-    width: 100%;
-  }
-  .login-part {
-    width: 100%;
-  }
-}
-
-@media only screen and (max-width: 1200px) {
-  .container {
-    display: block;
-    width: 80%;
-  }
-  .login-part {
-    width: 100%;
-  }
-}
-
 .right {
-  background-color: wheat;
-  align-items: center;
+  height: 80%;
   font-family: "Raleway", sans-serif;
-  text-align: center;
-  color: red;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .title {
@@ -73,65 +49,4 @@ main {
   color: #000000;
   text-align: center;
   font-size: 1.75rem;
-}
-
-.form-group {
-  background-color: #ededed;
-  margin: 10px;
-  width: 100%;
-  height: 50px;
-}
-form {
-  width: 70%;
-  margin: 0 auto;
-  text-align: start;
-}
-
-form input {
-  border: none;
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-form input:focus + label {
-  color: rgb(11, 195, 251);
-}
-
-form a {
-  font-size: 10px;
-  display: block;
-  text-align: end;
-  text-decoration: none;
-  color: #201b17;
-}
-form button {
-  display: block;
-  font-size: 18px;
-  margin: 20px auto;
-  border: none;
-  width: 150px;
-  height: 40px;
-  background-color: #201b17;
-  color: white;
-  cursor: pointer;
-}
-
-form button:hover {
-  background-color: #05b5f1;
-}
-
-form button:focus {
-  outline: none;
-}
-
-.right h5 {
-  padding-top: 15px;
-}
-
-.right img {
-  width: 20px;
-  padding: 10px;
-  vertical-align: middle;
 }
