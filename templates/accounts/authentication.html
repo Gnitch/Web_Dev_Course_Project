@@ -6,34 +6,39 @@
     <meta http-equiv="refresh" content=" 0; url = {% url 'quiz:home' %} " />
     {% endif %}
     <div class="container">
-      <div class="login-part right">
-        <h1 class="title">Quiz</h1>
-        <h3 class="welcome">Sign In</h3>
-        <form method="post">
-          {% csrf_token %} {{ form|crispy }} {% if type_form == 'login' %}
+      <div class="row py-3">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+          <div class="right p-3">
+            <h1 class="title">Quiz</h1>
+            <h3 class="welcome">Sign In</h3>
+            <form method="post">
+              {% csrf_token %} {{ form|crispy }} {% if type_form == 'login' %}
 
-          <div>
-            <a href="{% url 'accounts:pass_reset' %}">
-              <p>Reset Password</p>
-            </a>
-          </div>
-          <div>
-            <p>{{message}}</p>
-            <button class="mx-auto btn btn-primary d-block" type="submit">
-              Login
-            </button>
-          </div>
+              <div>
+                <a href="{% url 'accounts:pass_reset' %}">
+                  <p>Reset Password</p>
+                </a>
+              </div>
+              <div>
+                <p>{{message}}</p>
+                <button class="mx-auto btn btn-primary d-block" type="submit">
+                  Login
+                </button>
+              </div>
 
-          {% else %}
+              {% else %}
 
-          <p>{{message}}</p>
-          <div>
-            <button class="btn btn-primary mx-auto d-block" type="submit">
-              Register
-            </button>
+              <p>{{message}}</p>
+              <div>
+                <button class="btn btn-primary mx-auto d-block" type="submit">
+                  Register
+                </button>
+              </div>
+              {% endif %}
+            </form>
           </div>
-          {% endif %}
-        </form>
+        </div>
       </div>
     </div>
   </main>
