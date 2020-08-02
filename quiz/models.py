@@ -56,7 +56,6 @@ class Comments(models.Model):
 
 class Poll(models.Model):
     title = models.CharField(max_length=250)
-    description = models.TextField(null=True,blank=True)
     classes = models.ManyToManyField(Class)
     activate = models.BooleanField(default=False,primary_key=False)
 

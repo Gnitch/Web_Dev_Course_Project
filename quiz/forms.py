@@ -60,12 +60,11 @@ class PollForm(forms.ModelForm):
 
     class Meta :
         model = Poll
-        fields = ('title','description')
+        fields = ('title',)
 
     def __init__(self, *args, **kwargs):
         super(PollForm, self).__init__(*args, **kwargs)
         self.fields['title'].required=True 
-        self.fields['description'].required=False
 
 class PollChoicesForm(forms.ModelForm):
 

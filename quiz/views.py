@@ -445,16 +445,36 @@ def createPoll(request):
     if request.method == "POST":
         form = PollForm(request.POST)
         classList = request.POST.getlist('classList')
+        choices = str(request.POST.get('choice'))
         if request.user.job.status == 'teacher' :
             if form.is_valid():
                 form_obj = form.save()    
                 for each_class in classList:
                     form_obj.classes.add(Class.objects.get(pk=int(each_class)))
-                form_obj.save()
+                form_obj.save()        
+                if choices != '' :
+                    if ',' in choices :
+                        choice_list = choices.split(',')
+                        for choice in choice_list :
+                            poll_choice_obj = PollChoices.objects.create(
+                                choice=choice,
+                                poll_id=form_obj.id,
+                            )
+                            poll_choice_obj.save()
+
+                    else :
+                        poll_choice_obj = PollChoices.objects.create(
+                            choice=choices,
+                            poll_id=form_obj.id,
+                        )
+                        poll_choice_obj.save()
+
                 return redirect('quiz:createPollChoices',poll_id=form_obj.id) 
+
 
     class_list = get_list_or_404(Class, user=request.user)
     context = {
+        'poll_choice_form':PollChoicesForm(),
         'poll_form':PollForm,
         'class_list':class_list,
         'type':'poll_form',
