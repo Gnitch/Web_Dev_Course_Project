@@ -29,7 +29,9 @@ def home(request):
         temp_teach = []
         temp_stud = []
         for user in each.user.all():
-            if str(user.job.status) == 'teacher':
+            if user.is_superuser :
+                continue
+            elif str(user.job.status) == 'teacher':
                 temp_teach.append(user)
             else:
                 temp_stud.append(user)
@@ -77,7 +79,7 @@ def classView(request,class_pk):
     student_list = []
     for each_user in participant_list :        
         if each_user.is_superuser :
-            pass
+            continue
 
         elif str(each_user.job.status)== 'student' :
             student_list.append(each_user)              
@@ -110,7 +112,6 @@ def classView(request,class_pk):
 
 @login_required
 def addQuiz(request):
-
     if request.method == "POST":
         quiz_form = QuizForm(request.POST)
         classList = request.POST.getlist('classList')
@@ -319,9 +320,7 @@ def checkAnswer(request, question_id):
         result = ansCheck(request, question_id)
         question_obj = get_object_or_404(Question, pk=question_id)
         quiz = get_object_or_404(Quiz, pk=question_obj.quiz_id)
-        print(quiz.title)
         question_obj_list = list(StudentQuizInfo.objects.filter(quiz_id=question_obj.quiz_id).filter(user_id=request.user.id))
-        print(question_obj_list[0].id)
         if len(question_obj_list) != 0 :
             question_obj_list[0].quiz_questions.remove(question_obj)
             print(question_obj_list[0].quiz_questions.all())

@@ -1,5 +1,5 @@
-{% extends "./base.html" %} {% block content %} {% load crispy_forms_tags %} {%
-load static %}
+{% extends "./base.html" %} {% block content %} {% load crispy_forms_tags %} 
+{% load static %}
 <link rel="stylesheet" href="{% static 'quiz/poll.css' %}" />
 <div class="container">
   {% if request.user.job.status == 'teacher' %}
@@ -21,14 +21,14 @@ load static %}
       <br />
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    
     {% elif type == 'poll_view' %}
 
     <h1 class="text-center">Poll</h1>
     <h1 class="d-inline">{{poll_obj.title}}</h1>
     {% if poll_obj.activate == False %}
     <a href="{% url 'quiz:deletePoll' poll_obj.id %}"
-      ><button class="btn btn-danger mb-3">Delete poll</button></a
-    >
+      ><button class="btn btn-danger mb-3">Delete poll</button></a>
     {% endif %} {% include 'quiz/poll_result.html' %} {% if poll_obj.activate ==
     False %}
     <span class="text-danger">You cannot edit poll once it is live. </span>
@@ -43,7 +43,7 @@ load static %}
     <a href="{% url 'quiz:deactivatePoll' poll_obj.id %}"
       ><button class="btn btn-success">Deactivate poll</button></a
     >
-    {% endif %} {% endif %}
+    {% endif %} 
   </div>
   {% else %} {% if poll_obj.activate == True %}
   <h1 class="text-center">Poll</h1>

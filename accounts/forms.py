@@ -43,9 +43,12 @@ class UserSignUpForm(UserCreationForm):
         self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-custom', 'placeholder': 'Re-Enter Password'})   
         self.fields['password2'].help_text = None
         self.fields['email'].max_length = None
-        self.fields['email'].required=True
+        self.fields['email'].required=False
         self.fields['password1'].label = False
         self.fields['password2'].label = False
+        self.fields['username'].required = False
+        self.fields['password1'].required = False
+        self.fields['password2'].required = False
         self.fields['password1'].help_text = None
         self.fields['password2'].help_text = None
 

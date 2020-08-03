@@ -24,19 +24,23 @@
                 {% if request.user.job.status == 'student' %}
                     {% for quiz, info in quiz_info %}
                     <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
-                        <li class="list-group-item">{{quiz.title}}</li>
+                        <li class="list-group-item">{{quiz.title}}
                         {% if info.completed == True %}
-                            <h3>completed</h3>
+                            <i class="fa fa-check text-success"></i>
                         {% endif %}
+                        </li>
                     </a>
                     {% endfor %}
                 {% else %}
                     {% for quiz in quiz_list %}
                     <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
-                        <li class="list-group-item">{{quiz.title}}</li>
+                        <li class="list-group-item">{{quiz.title}}
                         {% if quiz.make_visible == True %}
-                            <h3>visible</h3>
+                            <span style="font-size: 12px;" class="text-secondary ml-2">live</span>
+                        {% else %}
+                            <i class="fa fa-signal-stream-slash text-danger"></i>
                         {% endif %}
+                        </li>
                     </a>
                     {% endfor %}                                     
                 {% endif %}

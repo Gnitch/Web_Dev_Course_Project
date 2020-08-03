@@ -19,7 +19,9 @@
     {% endif %}
     {% elif type == 'quiz_view' %}
     <h1 class="d-inline">{{quiz_obj.title}}</h1>
+    {% if quiz_obj.description %}
     <h4 class="text-secondary">{{quiz_obj.description}}</h3>
+    {% endif %}
         {% if request.user.job.status == 'teacher' %}
         {% if quiz_obj.make_visible == True %}
             {% if quiz_obj.answer_available == False %}
@@ -96,7 +98,6 @@
     let endpointNextQuestion = '/quiz/check_answer/{{question_obj.id}}'
 
     function ajax() { 
-        alert(endpointNextQuestion)
         let checked_array = '';
         $("input:checkbox[name=optionList]:checked").each(function () {
             checked_array = checked_array + $(this).val() + ',';

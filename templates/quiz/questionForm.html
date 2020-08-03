@@ -18,7 +18,7 @@
 <input placeholder="answer" name="inputText" id="answer" type="text">
 {% endif %}
 <button class="btn btn-sm btn-outline-primary" onclick="ajax()" type="button">Next question</button>
-
+{% if quiz_obj.timer %}
 <script>
   time =  parseInt('{{quiz_obj.timer}}');
   clearInterval(x);
@@ -31,5 +31,6 @@
   }, 1000);
 
 </script>
+{% endif %}
 
 
