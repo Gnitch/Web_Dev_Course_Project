@@ -29,13 +29,10 @@
   <title>Document</title>
 </head>
 
-<body style="height: 100vh">
+<body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="{% url 'quiz:home' %}">
-      <span class="nav_link" id="home">
-        Home        
-        <!-- <img src="{% static 'quiz/Braniac3.png' %}" alt="logo">        -->
-      </span>
+        <img src="{% static 'quiz/Braniac3.png' %}" alt="logo">       
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,10 +96,13 @@
           </li>
         {% endif %}
 
-        <li class="nav-item active">
-            <span class="nav_link text-light">
-              {% if user.is_authenticated %} {{request.user.username}} {% endif %}
-            </span>
+        <li class="nav-item active border border-light">
+            <a class="nav-link" href="#">
+              <i class="fa fa-user text-light"></i>
+              <span class="nav_link">
+                {% if user.is_authenticated %} {{request.user.username}} {% endif %}
+              </span>
+            </a>
             <span class="sr-only">(current)</span>
         </li        
       </ul>
