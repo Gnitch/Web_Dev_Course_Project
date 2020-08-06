@@ -12,7 +12,7 @@
 Install the following dependencies. `cd` into your project folder and enter command `python manage.py runserver`. After this provided there are no errors the server will be started at `localhost:8000` which you can open in your browser.
 The login credentials are as follows
 
-### Users - admin,user1,user2,user3,user4,teacher1,teacher2
+### Users - admin,user1,user2,user3,user4,user5,user6,user10,teacher1,teacher2,teacher3,teacher4
 
 ### Password - sagittarius123
 
