@@ -81,7 +81,7 @@ def add_classes(request):
 @user_passes_test(lambda u : u.is_superuser)
 def userRegister(request):
     if request.method == 'POST' :
-        job = request.POST.get('job')
+        job = request.POST.get('job')        
         classList = request.POST.getlist('classList')
         form =  UserSignUpForm(request.POST)
         if form.is_valid():

@@ -116,7 +116,10 @@ def addQuiz(request):
         quiz_form = QuizForm(request.POST)
         classList = request.POST.getlist('classList')
         if(quiz_form.is_valid()):
-            quiz_obj = quiz_form.save()
+            quiz_obj = quiz_form.save(commit=False)
+            quiz_obj.created_by_id = request.user.id 
+            quiz_obj.save()
+            
             for each_class in classList:
                 quiz_obj.classes.add(Class.objects.get(pk=int(each_class)))
             quiz_obj.save()
@@ -146,8 +149,7 @@ def makeQuizVisible(request, quiz_id):
 
 @login_required
 def quizAnswerVisible(request, quiz_id):
-    if request.user.job.status == 'teacher':
-        print("YEss")
+    if request.user.job.status == 'teacher':        
         quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
         quiz_obj.answer_available = True
         quiz_obj.save()
@@ -182,6 +184,16 @@ def quizInfoTeacherView(request, quiz_id):
         quiz_obj = None
     else:
         quiz_obj = quiz_list[0]
+
+        if str(request.user.job.status) == 'teacher':
+            if int(request.user.id) != int(quiz_obj.created_by_id) :
+                question_list = list(Question.objects.filter(quiz_id=quiz_obj.id))
+                context = {
+                    'quiz_obj':quiz_obj,
+                    'quesion_list':question_list
+                }
+                return render(request,'quiz/quizAnswer.html',context)
+
         random_question_obj = None
         if str(request.user.job.status) == 'student':
             if not StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id).exists():
@@ -250,11 +262,11 @@ def ansCheck(request, question_id):
     answer_list = []
     if input_answer is not None:
         if input_answer == str(random_question_obj.answer):
-            result = 'correct'
+            result = 'Your answer is correct !!!'
             scoreSave(student_quiz_info)
 
         else:
-            result = 'incorrect'
+            result = 'Your answer is incorrect !!!'
     elif user_ans is not None:
         user_ans = user_ans[:-1]
         user_answers = user_ans.split(',')
@@ -270,11 +282,11 @@ def ansCheck(request, question_id):
                 flag = False
                 break
         if flag == True:
-            result = 'correct'
+            result = 'Your answer is correct !!!'
             scoreSave(student_quiz_info)
 
         else:
-            result = 'incorrect'
+            result = 'Your answer is incorrect !!!'
     return result
 
 
@@ -389,15 +401,13 @@ def deleteQuestion(request, question_id):
 @login_required
 def deleteQuiz(request, quiz_id):
     quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
-    question_list = get_list_or_404(Question, quiz_id=quiz_id)
     question_list = list(Question.objects.filter(quiz_id=quiz_id))
-    if quiz_obj.make_visible == False and str(request.user.job.status) == 'teacher':
+    if (quiz_obj.make_visible == False or quiz_obj.answer_available == True) and str(request.user.job.status) == 'teacher':
         if len(question_list) != 0 :
             for question in question_list:            
                 Options.objects.filter(question_id=question.id).delete()
-                if question.figure is not None:
-                    os.remove(os.path.join(settings.MEDIA_ROOT,
-                                        str(question.figure.name)))
+                if str(question.figure.name) is not '':
+                    os.remove(os.path.join(settings.MEDIA_ROOT,str(question.figure.name)))
 
                 question.delete()
         quiz_obj.delete()
@@ -447,7 +457,9 @@ def createPoll(request):
         choices = str(request.POST.get('choice'))
         if request.user.job.status == 'teacher' :
             if form.is_valid():
-                form_obj = form.save()    
+                form_obj = form.save(commit=False)
+                form_obj.created_by_id = request.user.id 
+                form_obj.save()
                 for each_class in classList:
                     form_obj.classes.add(Class.objects.get(pk=int(each_class)))
                 form_obj.save()        

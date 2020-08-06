@@ -12,7 +12,7 @@ class QuizForm(forms.ModelForm):
         self.fields['title'].required = True  
         self.fields['description'].required = False 
         self.fields['timer'].required = False
-        self.fields['timer'].help_text = "Keep input blank if no timer is required and time should be between '10 < time < 30' sec"
+        self.fields['timer'].help_text = "Keep input blank if no timer is required and time should be between '10 < time < 120' seconds"
 
 class QuestionForm(forms.ModelForm):
     class Meta:
@@ -72,7 +72,7 @@ class PollChoicesForm(forms.ModelForm):
         model = PollChoices
         fields = ('choice',)
         widgets = {
-            'choice': forms.TextInput(attrs={'placeholder':'Enter choice'}),
+            'choice': forms.TextInput(attrs={'placeholder':'Add a choice'}),
         }   
 
     def __init__(self, *args, **kwargs):

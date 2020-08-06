@@ -17,13 +17,14 @@ class Class(models.Model):
     user = models.ManyToManyField(User)
 
 class Quiz(models.Model):
+    created_by = models.ForeignKey(User,on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     description = models.TextField()
     classes = models.ManyToManyField(Class)
     make_visible = models.BooleanField(default=False)
     total_questions = models.IntegerField(primary_key=False,default=0)
     answer_available = models.BooleanField(primary_key=False,default=False)
-    timer = models.IntegerField(primary_key=False,null=True,blank=True,validators=[MinValueValidator(9), MaxValueValidator(31)],)
+    timer = models.IntegerField(primary_key=False,null=True,blank=True,validators=[MinValueValidator(9), MaxValueValidator(120)],)
 
     def __str__(self):
         return self.title
@@ -55,6 +56,7 @@ class Comments(models.Model):
 
 
 class Poll(models.Model):
+    created_by = models.ForeignKey(User,on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     classes = models.ManyToManyField(Class)
     activate = models.BooleanField(default=False,primary_key=False)

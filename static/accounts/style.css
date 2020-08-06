@@ -41,6 +41,14 @@ main .row {
   justify-content: space-around;
 }
 
+.register{
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  font-family: "Raleway", sans-serif;
+  background-color: white;
+}
+
 .title {
   font-family: "valorant";
   font-size: 3.5rem;

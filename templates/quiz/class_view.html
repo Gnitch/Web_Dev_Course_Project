@@ -19,8 +19,8 @@
     </div>
     <div class="row">
         <div class="col-md-8">
-            <h5>Quiz</h5>
-            <ul class="list-group">
+            <h5>Quiz</h5>         
+            <ul class="list-group">                         
                 {% if request.user.job.status == 'student' %}
                     {% for quiz, info in quiz_info %}
                     <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
@@ -36,9 +36,7 @@
                     <a href="{% url 'quiz:quizInfoTeacherView' quiz.id %}">
                         <li class="list-group-item">{{quiz.title}}
                         {% if quiz.make_visible == True %}
-                            <span style="font-size: 12px;" class="text-secondary ml-2">live</span>
-                        {% else %}
-                            <i class="fa fa-signal-stream-slash text-danger"></i>
+                            <span style="font-size: 12px;font-style: italic;" class="text-secondary ml-2">live</span>
                         {% endif %}
                         </li>
                     </a>
@@ -46,23 +44,19 @@
                 {% endif %}
             </ul>
         </div>
-        <div class="col-md-4">
-            <h5>Students </h5>
-                <ul class="list-group">
-                    {% for each_student in student_list %}
-                    <li class="list-group-item">{{each_student}}</li>
-                    {% endfor %}
-                </ul>
-        </div>
-
-    </div>
-    <div class="row">
         
-        <div class="col-md-8 mt-2">
+        <div class="col-md-4 mt-2">
             <h5>Poll</h5>         
             <ul class="list-group">
                 {% for poll in poll_list %}
-                    <a href="{% url 'quiz:createPollChoices' poll.id %}"><li class="list-group-item">{{poll.title}}</li></a>                    
+                    <a href="{% url 'quiz:createPollChoices' poll.id %}"><li class="list-group-item">{{poll.title}}
+                        {% if request.user.job.status == 'teacher' %}                        
+                            {% if poll.activate == True %}
+                                <span style="font-size: 12px;font-style: italic;" class="text-secondary ml-2">live</span>                                
+                            {% endif %}
+                        {% endif %}
+                    </li></a>                    
+
                 {% endfor %}
             </ul>
         </div>
@@ -85,6 +79,15 @@
                 {{comments_form|crispy}}
                 <button class="btn btn-dark w-100" type="submit">Post</button>
             </form>            
+        </div>
+
+        <div class="col-md-4 d-none d-md-block">
+            <h5>Students </h5>
+                <ul class="list-group">
+                    {% for each_student in student_list %}
+                    <li class="list-group-item">{{each_student}}</li>
+                    {% endfor %}
+                </ul>
         </div>
 
     </div>

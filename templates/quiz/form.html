@@ -22,7 +22,7 @@
     {% if quiz_obj.description %}
     <h4 class="text-secondary">{{quiz_obj.description}}</h3>
     {% endif %}
-        {% if request.user.job.status == 'teacher' %}
+        {% if quiz_obj.created_by_id  == request.user.id %}
         {% if quiz_obj.make_visible == True %}
             {% if quiz_obj.answer_available == False %}
             <a class="btn btn-primary" role="button" href="{% url 'quiz:quizAnswerVisible' quiz_obj.id %}">Make Answers of
@@ -70,7 +70,8 @@
         <!-- <a class="btn btn-success" href="{% url 'quiz:studentQuizResult' quiz_obj.id %}">Student score</a> -->
         {% if quiz_obj.make_visible == False %}
         <h2>Add Question</h2>
-        <span class="text-danger">You cannot edit quiz once it is live. </span><a class="btn btn-outline-primary"
+        <span class="text-danger">You cannot edit quiz once it is live. <br> 
+            There should be atleast one question </span><a class="btn btn-outline-primary"
             href="{% url 'quiz:makeQuizVisible' quiz_obj.id %}">Make Quiz Visible to
             students</a>
         <form action="{% url 'quiz:questionFormSubmit' quiz_obj.id %}" enctype="multipart/form-data" method="POST">
