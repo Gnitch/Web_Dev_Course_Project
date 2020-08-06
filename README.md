@@ -1,7 +1,7 @@
 # Braniac - A quizing web app
-
+![](static/quiz/Braniac2.png)
 <p align="center">
-    ![](static/quiz/Braniac2.png)
+    
 </p>
 
 
