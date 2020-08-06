@@ -1,5 +1,10 @@
 # Braniac - A quizing web app
 
+<p align="center">
+    ![](static/quiz/Braniac2.png)
+</p>
+
+
     This web app was built using the Django Web framework.
 
 | [Alan Dsilva](https://github.com/alandsilva26) | [Sujoy Dchuna](https://github.com/Gnitch) | [Mark Coutinho](https://github.com/markcoutinho) |
