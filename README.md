@@ -1,7 +1,7 @@
 # Braniac - A quizing web app
-![](static/quiz/Braniac2.png)
+<!--![](static/quiz/Braniac2.png)-->
 <p align="center">
-    
+   <img src=![](static/quiz/Braniac2.png) alt="Logo" width="80" height="80">
 </p>
 
 
