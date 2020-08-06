@@ -1,5 +1,5 @@
 # Braniac - A quizing web app
-[](static/quiz/Braniac2.png | width=48)
+[](static/quiz/Braniac3.png)
 
     This web app was built using the Django Web framework.
 
