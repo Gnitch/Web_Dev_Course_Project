@@ -1,9 +1,5 @@
 # Braniac - A quizing web app
-<!--![](static/quiz/Braniac2.png)-->
-<p align="center">
-   <img src=![](static/quiz/Braniac2.png) alt="Logo" width="80" height="80">
-</p>
-
+[](static/quiz/Braniac2.png | width=48)
 
     This web app was built using the Django Web framework.
 
