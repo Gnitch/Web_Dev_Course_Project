@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Job(models.Model):
@@ -16,6 +17,9 @@ class Class(models.Model):
     branch = models.CharField(max_length=50)
     user = models.ManyToManyField(User)
 
+    def get_absolute_url(self):
+        return reverse('quiz:classView',args=[str(self.id)])
+
 class Quiz(models.Model):
     created_by = models.ForeignKey(User,on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
@@ -28,6 +32,9 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('quiz:quizInfoTeacherView',args=[str(self.id)])        
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
@@ -48,6 +55,9 @@ class StudentQuizInfo(models.Model):
     quiz_questions = models.ManyToManyField(Question)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
 
+    def get_absolute_url(self):
+        return reverse('quiz:getQuizResult',args=[str(self.id)])   
+
 class Comments(models.Model):
     comment = models.TextField(blank=False,null=False)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -60,6 +70,9 @@ class Poll(models.Model):
     title = models.CharField(max_length=250)
     classes = models.ManyToManyField(Class)
     activate = models.BooleanField(default=False,primary_key=False)
+
+    def get_absolute_url(self):
+        return reverse('quiz:createPollChoices',args=[str(self.id)])    
 
 class PollChoices(models.Model):
     choice = models.TextField(blank=False,null=False)

@@ -15,10 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.sitemaps.views import sitemap
+from quiz.sitemaps import ClasSitemap, QuizSitemap, PollSitemap, StaticHomeSitemap, QuizResultSitemap
 from django.conf.urls.static import static
 from django.conf import settings
 
+sitemaps = {
+    'clases': ClasSitemap,
+    'quiz':QuizSitemap,
+    'poll':PollSitemap,
+    'home':StaticHomeSitemap,
+    'quiz_result':QuizResultSitemap
+}
+
 urlpatterns = [
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),    
     path('admin/', admin.site.urls),
     path('quiz/',include('quiz.urls')),
     path('',include('accounts.urls')),

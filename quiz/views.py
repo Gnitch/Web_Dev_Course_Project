@@ -11,14 +11,14 @@ from .models import Quiz, Question, Options, StudentQuizInfo, Job, Class, Commen
 from .forms import QuizForm, QuestionForm, OptionsForm, CommentsForm, PollForm, PollChoicesForm
 
 
-@login_required
+@login_required(login_url='/')
 def logout(request):
     if request.user.is_authenticated:
         django_logout(request)
     return redirect('/')
 
 
-@login_required
+@login_required(login_url='/')
 def home(request):
     class_list = list(Class.objects.filter(user=request.user))
     faculty_count = []
@@ -51,7 +51,7 @@ def home(request):
     return render(request, 'quiz/home.html', context)
 
 
-@login_required
+@login_required(login_url='/')
 def classView(request,class_pk):
     stud_info = []
     quiz_info = []
@@ -110,7 +110,7 @@ def classView(request,class_pk):
     return render(request,'quiz/class_view.html',context)
 
 
-@login_required
+@login_required(login_url='/')
 def addQuiz(request):
     if request.method == "POST":
         quiz_form = QuizForm(request.POST)
@@ -135,7 +135,7 @@ def addQuiz(request):
     return render(request, 'quiz/form.html', context)
 
 
-@login_required
+@login_required(login_url='/')
 def makeQuizVisible(request, quiz_id):
     if request.user.job.status == 'teacher':
         quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
@@ -147,7 +147,7 @@ def makeQuizVisible(request, quiz_id):
     return redirect('quiz:quizInfoTeacherView', quiz_id=quiz_id)
 
 
-@login_required
+@login_required(login_url='/')
 def quizAnswerVisible(request, quiz_id):
     if request.user.job.status == 'teacher':        
         quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
@@ -168,7 +168,7 @@ def getOptions(question_obj):
     return option_list
 
 
-@login_required
+@login_required(login_url='/')
 def quizInfoTeacherView(request, quiz_id):
     student_list = []
     random_question_obj = None
@@ -297,7 +297,7 @@ def scoreSave(student_quiz_info):
     student_quiz_info.save()
 
 
-@login_required
+@login_required(login_url='/')
 def getQuizResult(request, quiz_id):
     student_quiz_info = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id).filter(user_id=request.user.id))[0]
     student_quiz_info.completed = True
@@ -306,7 +306,7 @@ def getQuizResult(request, quiz_id):
     context = {'student_quiz_info':student_quiz_info,'quiz_obj':quiz_obj}
     return render(request, 'quiz/quizResult.html',context)
 
-@login_required
+@login_required(login_url='/')
 def questionFormSubmit(request, quiz_id):
     if request.method == 'POST':
         question_form = QuestionForm(request.POST, request.FILES)
@@ -323,7 +323,7 @@ def questionFormSubmit(request, quiz_id):
     return redirect('quiz:quizInfoTeacherView', quiz_id=quiz_id)
 
 
-@login_required
+@login_required(login_url='/')
 def checkAnswer(request, question_id):
     if request.is_ajax():
         print("AJAX")
@@ -370,7 +370,7 @@ def checkAnswer(request, question_id):
         redirect('/quiz/')
 
 
-@login_required
+@login_required(login_url='/')
 def studentQuizResult(request, quiz_id):
     quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
     student_list = list(StudentQuizInfo.objects.filter(quiz_id=quiz_id))
@@ -383,7 +383,7 @@ def studentQuizResult(request, quiz_id):
     return render(request, 'quiz/StudentQuizResult.html', context)
 
 
-@login_required
+@login_required(login_url='/')
 def deleteQuestion(request, question_id):
     question_obj = get_object_or_404(Question, pk=question_id)
     quiz_obj = get_object_or_404(Quiz, pk=question_obj.quiz_id)
@@ -398,7 +398,7 @@ def deleteQuestion(request, question_id):
     return redirect('quiz:quizInfoTeacherView', quiz_id=question_obj.quiz_id)
 
 
-@login_required
+@login_required(login_url='/')
 def deleteQuiz(request, quiz_id):
     quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
     question_list = list(Question.objects.filter(quiz_id=quiz_id))
@@ -415,7 +415,7 @@ def deleteQuiz(request, quiz_id):
     return redirect('/quiz/')
 
 
-@login_required
+@login_required(login_url='/')
 def postComment(request, class_id):
     if request.method == 'POST':
         form = CommentsForm(request.POST)
@@ -428,14 +428,14 @@ def postComment(request, class_id):
     return redirect('quiz:classView', class_pk=class_id)
 
 
-@login_required
+@login_required(login_url='/')
 def deleteComment(request, comment_id):
     comment_obj = get_object_or_404(Comments,pk=comment_id)
     class_obj = get_object_or_404(Class,pk=comment_obj.clas_id)
     comment_obj.delete()
     return redirect('quiz:classView',class_pk=class_obj.id)
 
-@login_required
+@login_required(login_url='/')
 def quizAnswer(request, stud_quiz_info_id, quiz_id):
     quiz_obj = get_object_or_404(Quiz, pk=quiz_id)
     if quiz_obj.answer_available == True:
@@ -449,7 +449,7 @@ def quizAnswer(request, stud_quiz_info_id, quiz_id):
     else:
         return redirect('quiz:quizInfoTeacherView', quiz_id=quiz_id)
 
-@login_required
+@login_required(login_url='/')
 def createPoll(request):
     if request.method == "POST":
         form = PollForm(request.POST)
@@ -492,7 +492,7 @@ def createPoll(request):
     }
     return render(request,'quiz/poll.html',context)
 
-@login_required
+@login_required(login_url='/')
 def createPollChoices(request, poll_id):
     if request.method == 'POST':
         form = PollChoicesForm(request.POST)
@@ -550,7 +550,7 @@ def getPollResult(poll_id):
     }
     return context
 
-@login_required
+@login_required(login_url='/')
 def deletePollChoice(request,poll_choice_id):
     poll_choice_obj = get_object_or_404(PollChoices,pk=poll_choice_id)
     poll_obj = get_object_or_404(Poll,pk=poll_choice_obj.poll_id)
@@ -559,7 +559,7 @@ def deletePollChoice(request,poll_choice_id):
     
     return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
 
-@login_required
+@login_required(login_url='/')
 def deletePoll(request,poll_id):
     poll_obj = get_object_or_404(Poll,pk=poll_id)
     if request.user.job.status == 'teacher' and poll_obj.activate == False:
@@ -571,7 +571,7 @@ def deletePoll(request,poll_id):
         poll_obj.delete()
     return redirect('/quiz/')    
 
-@login_required
+@login_required(login_url='/')
 def activatePoll(request, poll_id):
     poll_obj = get_object_or_404(Poll,pk=poll_id)
     poll_choices = list(PollChoices.objects.filter(poll_id=poll_id))
@@ -581,7 +581,7 @@ def activatePoll(request, poll_id):
             poll_obj.save()
     return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
 
-@login_required
+@login_required(login_url='/')
 def deactivatePoll(request, poll_id):
     poll_obj = get_object_or_404(Poll,pk=poll_id)
     if request.user.job.status == 'teacher' and poll_obj.activate == True:
@@ -589,7 +589,7 @@ def deactivatePoll(request, poll_id):
         poll_obj.save()        
     return redirect('quiz:createPollChoices',poll_id=poll_obj.id) 
 
-@login_required
+@login_required(login_url='/')
 def userSubmitPollChoice(request):
     poll_choice_id = int(request.POST.get('choiceList'))
     poll_choice_obj = get_object_or_404(PollChoices,pk=poll_choice_id)
@@ -605,7 +605,7 @@ def userSubmitPollChoice(request):
 
     return redirect('quiz:userResultPoll',poll_id=poll_obj.id) 
 
-@login_required
+@login_required(login_url='/')
 def userResultPoll(request,poll_id):
     context = getPollResult(poll_id)
     context['type'] = 'result'

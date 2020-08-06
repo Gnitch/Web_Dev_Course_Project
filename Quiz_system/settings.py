@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'crispy_forms',  
     'quiz.apps.QuizConfig',
     'accounts.apps.AccountsConfig',
+    'django.contrib.sitemaps',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,18 @@ MEDIA_URL = '/media/'
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_username '
+EMAIL_HOST_PASSWORD = ' your_eamil_client_password '
+
+LOGIN_URL = ''
+
+
+
+
+
+

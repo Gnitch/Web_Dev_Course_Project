@@ -24,7 +24,7 @@ class UserSignUpForm(UserCreationForm):
  
     class Meta :
         model = User
-        fields = ('username', 'email', 'password1', 'password2',)       
+        fields = ('username', 'email', 'password1', )       
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-custom','placeholder':'Enter Username'}),
             'email': forms.EmailInput(attrs={'class': 'form-custom','placeholder':'Enter Email'}),
