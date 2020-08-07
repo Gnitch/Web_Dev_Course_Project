@@ -24,6 +24,9 @@ The login credentials are as follows
 - [Bootstrap as cdn(will require connection to internet) - preadded](https://getbootstrap.com/)
 
 ![](Screenshots/home.png)
+-------
 ![](Screenshots/class_view.png)
+-------
 ![](Screenshots/poll.png)
+-------
 ![](Screenshots/quiz.png)
