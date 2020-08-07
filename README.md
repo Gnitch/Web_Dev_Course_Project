@@ -22,3 +22,8 @@ The login credentials are as follows
 - [django_crispy_forms](https://django-crispy-forms.readthedocs.io/en/latest/)
 - [Pillow](https://pypi.org/project/Pillow/2.2.1/)
 - [Bootstrap as cdn(will require connection to internet) - preadded](https://getbootstrap.com/)
+
+![](Screenshots/home.png)
+![](Screenshots/class_view.png)
+![](Screenshots/poll.png)
+![](Screenshots/quiz.png)
