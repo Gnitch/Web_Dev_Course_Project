@@ -25,7 +25,7 @@ The login credentials are as follows
 
 ![](Screenshots/home.png)
 -------
-![](Screenshots/class_view.png)
+![](Screenshots/classs_view.png)
 -------
 ![](Screenshots/poll.png)
 -------
